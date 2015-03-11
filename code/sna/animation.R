@@ -1,6 +1,6 @@
 # Author: Jeff Hemsley jhemsley at uw dot edu
 # Created: Nov 20 2012
-# 
+
 # File generates random graph with random dates and creates set of pngs for animation
 library(igraph)
 

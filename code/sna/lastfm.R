@@ -3,6 +3,7 @@
 
 require(igraph)
 require(foreign)
+
 lastfm<-read.csv("./data/sna/lastfm_network_ad.csv", header=T,
                  encoding="UTF-8") #Load the dataset
 
