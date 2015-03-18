@@ -60,6 +60,9 @@ while(mongo.cursor.next(cursor)) {
   ## Bind to the master data frame
   call.data <- rbind.fill(call.data, call.df)
 }
+## Release the resources attached to cursor on both client and server
+done <- mongo.cursor.destroy(cursor)
+
 ## Alternative:
 calls <- mongo.find.all(mongo, namespace, query=query, limit=100L)
 
