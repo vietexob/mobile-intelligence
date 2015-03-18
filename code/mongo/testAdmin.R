@@ -10,7 +10,7 @@ db <- "admin"
 ## Connect to MongoDB remote server
 mongo <- mongo.create(host = host, db = db, username = username, password = password)
 
-## The database we're working with is 'admin' and the collection is 'example'
+## The database we're working with is 'admin' and the collection is 'cellular'
 collection <- "cellular"
 namespace <- paste(db, collection, sep=".")
 
@@ -29,7 +29,6 @@ attr.names <- c("caller_id", "county_id", "calltype_id", "callee_id", "date", "t
 ## Get a list of calls for phone's imei 355001000488650
 cursor <- mongo.find(mongo, namespace, query=list(imei=355001000488650))
 calls <- NULL
-call.start_datetime <- NULL
 while(mongo.cursor.next(cursor)) {
   value <- mongo.cursor.value(cursor)
   calls <- c(calls, list(mongo.bson.to.list(value)))
@@ -42,26 +41,21 @@ call.data <- call.data[, -1]
 ## Rename the columns
 colnames(call.data) <- attr.names
 
-## Build a query to find all calls on 03/01/2008
-buf <- mongo.bson.buffer.create()
-mongo.bson.buffer.start.object(buf, "start_datetime")
-mongo.bson.buffer.append(buf, "$in", "20080301")
-mongo.bson.buffer.finish.object(buf)
-criteria <- mongo.bson.from.buffer(buf)
-
-## Retrieve the first 50
-calls <- list()
-max.count <- 50
-counter <- 0
-cursor <- mongo.find(mongo, namespace, bson)
+## Build a query to find all phone calls on 03/01/2008
+cursor <- mongo.find(mongo, namespace, query=list(date=20080301), limit=100L)
+## Retrieve the first 50 calls
+calls <- NULL
 while(mongo.cursor.next(cursor)) {
-  val <- mongo.cursor.value(cursor)
-  numbers[[length(numbers)+1]] <- mongo.bson.value(val, "imei")
-  counter <- counter + 1
-  if(counter == max.count) {
-    break
-  }
+  value <- mongo.cursor.value(cursor)
+  calls <- c(calls, list(mongo.bson.to.list(value)))
 }
+
+## Convert to dataframe
+call.data.1 <- data.frame(matrix(unlist(calls), nrow=length(calls), byrow=TRUE))
+## Remove the first column '_id'
+call.data.1 <- call.data.1[, -1]
+## Rename the columns
+colnames(call.data.1) <- attr.names
 
 
 
