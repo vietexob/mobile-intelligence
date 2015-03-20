@@ -1,8 +1,11 @@
 rm(list = ls())
 
 library(rmongodb)
-library(plyr)
 library(ggplot2)
+library(scales)
+library(plyr)
+
+source("./code/util/fivethirtyeight_theme.R")
 
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
@@ -75,8 +78,7 @@ loc.dec <- strtoi(loc, 16L)
 ## Get the distribution of tower locations -- not the best way
 mongo.count(mongo, namespace, list(cell_id=toString(loc[1])))
 
-## Using the aggregation framework
-## Find the distribution of all cell towers
+## Use the aggregation framework to find the distribution of all cell towers
 pipe_1 <- mongo.bson.from.JSON(
   '{"$group":
     {"_id": "$cell_id", "count": {"$sum": 1}}
@@ -97,10 +99,17 @@ dloc.distr <- as.data.frame(t(mloc.distr))
 colnames(dloc.distr) <- c("cell_id", "freq")
 dloc.distr$freq <- as.numeric(dloc.distr$freq)
 
-## Visualize the result: plot the top 15 locations
-dloc.distr.top <- head(dloc.distr, 15)
-ggplot(dloc.distr.top, aes(cell_id, freq, fill=freq)) + guides(fill=FALSE) +
-  geom_bar(stat = "identity", color = "white") + xlab("cell_id") + ylab("freq")
+## Visualize the result: plot the top 10 locations
+dloc.distr.top <- head(dloc.distr, 10)
+(ggplot(dloc.distr.top, aes(cell_id, freq, fill=freq)) + guides(fill=FALSE) +
+  geom_bar(stat = "identity", color = "white") + xlab("cell_id") + ylab("freq") +
+   ggtitle("Top 10 Locations by Frequency"))
+
+(ggplot(dloc.distr, aes(freq)) + geom_histogram(binwidth=50, fill="#c0392b", alpha=0.75) +
+  fivethirtyeight_theme() +
+  labs(title="Distribution of Cell Tower Frequencies",
+       x="Count", y="Frequency") + scale_x_continuous(labels=comma) +
+  scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
 
 ## Close the connection
 mongo.disconnect(mongo)
