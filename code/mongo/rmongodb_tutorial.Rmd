@@ -10,9 +10,15 @@ knitr::opts_chunk$set(ig.width=4, fig.height=3, fig.path='./mongo_fig/',
                       warning=FALSE)
 ```
 
-This tutorial demonstrates how to connect to the MongoDB server that hosts the datasets used for the coursework project. Before we begin, make sure that your computer is being connected to the CMU campus network. If you are off campus, you will need to access it via VPN, see <http://www.cmu.edu/computing/network/vpn/>. I assume that by now you have successfully installed `R` and `RStudio` in your computer. I also assume that you have installed the `R` package `rmongodb`. If you have not, do it by typing `install.packages("rmongodb", dependencies=TRUE)` in the console of `RStudio`. Two other packages that we will be using frequently in this course are `plyr` (for data manipulation) and `ggplot2` (for visualization), so make sure you have them installed as well.
+This tutorial demonstrates how to connect to the MongoDB server that hosts the datasets used for the MIB coursework project. Before we begin, make sure that your computer is being connected to the CMU campus network. If you are off campus, you will need to access it via VPN, see <http://www.cmu.edu/computing/network/vpn/>. I assume that by now you have successfully installed `R` and `RStudio` in your computer. I also assume that you have installed the `R` package `rmongodb`. If you have not, do it by typing
 
-We first load the installed packages using the command:
+```{r install_packages, eval=FALSE}
+install.packages("rmongodb", dependencies=TRUE)
+```
+
+in the console of `RStudio`. Two other packages that we will be using frequently in this course are `plyr` (for data manipulation) and `ggplot2` (for data visualization), so make sure you have them installed as well.
+
+We first load the installed packages:
 
 ```{r load_packages, include=TRUE}
 library(rmongodb)
@@ -42,32 +48,32 @@ Under normal circumstances, the connection will be successful and nothing will b
 mongo.is.connected(mongo)
 ```
 
-We now declare variables for the collection name and namespace. If you are familiar with SQL, a **collection** in MongoDB is like a **big** SQL table that can contain millions of rows. A **namespace** is just a concatenation of the database name and the collection name with a period character in between.
+We now declare variables for the collection name and namespace. If you are familiar with SQL, a **collection** in MongoDB is like a **BIG** SQL table that can contain millions of rows. A **namespace** is just a concatenation of the database name and the collection name with a period character in between.
 
 ```{r namespace}
 collection <- "cellular" ## we are using the mobile phone data for now
 namespace <- paste(db, collection, sep=".")
 ```
 
-Note that we are using the `cellular` collection througout this tutorial. The other two collections can be accessed using the same way. We are now ready to make our first query. Before we do that, we wish to know what collections are there in the database?
+Note that we are using the `cellular` collection througout this tutorial. The other two collections can be accessed similarly. We are now ready to make our first query. Before we do that, we wish to know what collections are there in the database?
 
 ```{r show_collections}
 mongo.get.database.collections(mongo, db="admin")
 ```
 
-The results above show that we have three collections: `cellular` (the mobile phone data), `taxi` (the taxicab data), and `income` (the taxi fare data). Suppose our current namespace is unchanged, we can query the number of records in the `cellular` collection as:
+The results above show that we have three collections: `cellular` (the **mobile phone** data), `taxi` (the **taxicab** data), and `income` (the **taxi fare** data). Suppose our current namespace is unchanged, we can query the number of records in the `cellular` collection as:
 
 ```{r num_records}
 mongo.count(mongo, namespace)
 ```
 
-It is often useful to have a rough picture of what our records look like in the collection (like what fields are there). Then, you'd want to see sample record in the current collection:
+It is often useful to have a rough picture of what our records look like in the collection (like what fields are there). Then, you'd want to see a sample record in the current collection:
 
 ```{r sample_record}
 (sample <- mongo.find.one(mongo, namespace))
 ```
 
-We know that each record contains an IMEI number (among many other things), which uniquely identifies a mobile phone device. Suppose now we know an IMEI number and we wish to retrieve all call records from that IMEI in our collection. We can define a query to do that. We also wish to define the fields that we are interested in (and not all of them) in our retrieved data since not all information is equally useful.
+We know that each record contains an **IMEI number** (among many other things), which uniquely identifies a mobile phone device. Suppose now we know an IMEI number and we wish to retrieve all call records from that particular IMEI in our collection. We can define a query to do that. We also wish to define the fields that we are interested in (and not all of them) in our retrieved data since not all information is equally useful.
 
 ```{r retrieve_imei, results='hide'}
 ## Define the query
@@ -87,7 +93,7 @@ mongo.bson.buffer.append(fields, "cell_id", 1L)
 fields <- mongo.bson.from.buffer(fields)
 ```
 
-The result of the query is a **cursor** object that represents a pointer to the results of our query. To get the actual records, we need to iterate over them, record by record. We also want to store the retrieved records in an `R` data frame called `call.data` for further analysis.
+The result is a **cursor** object that represents a pointer to the results of our query. To get the actual records, we need to iterate over them, record by record. We also want to store the retrieved records in an `R` data frame called `call.data` for further analysis.
 
 ```{r query_imei}
 ## Create the query cursor
@@ -119,7 +125,7 @@ query <- mongo.bson.from.list(list('date'=20080301))
 calls <- mongo.find.all(mongo, namespace, query=query, limit=100L)
 ```
 
-Now we are curious about the cell towers. Remember that each cell tower is a spatial location with latitude and longitude coordinates. If we wish to retrieve the list of all cell tower ID's and count how many of them there are, then we make the following query:
+Now we are curious about the **cell towers**. Remember that each cell tower is a spatial location with latitude and longitude coordinates. If we wish to retrieve the list of all cell tower ID's and count how many of them there are, then we make the following query:
 
 ```{r query_distinct}
 ## Get the list of distinct cell tower locations. WARNING: This may take a while
@@ -127,14 +133,14 @@ all.locs <- mongo.distinct(mongo, namespace, "cell_id")
 ## Convert from list to vector
 loc.vector <- unlist(all.locs)
 ## Take a look at the first 10 cell_id's
-head(loc.vector)
+head(loc.vector, 10)
 ## How many locations are there?
 length(loc.vector)
 ```
 
 The returned list, however, doesn't tell us about the **distribution** of those cell towers, i.e., how many calls were made near each of the towers. This distribution will tell us valuable information about the population density in the city during the time period, over the days of a week, or over the hours of a day. In order to retrieve such a distribution, we need a more advanced querying method. Fortunately, MongoDB comes with the powerful **aggregation framework** that streamlines the data retrieval process as a **pipeline** and allows applying useful **operators** along the way to reduce the complexity of data retrieval. Learn more about the aggregation framework here: <http://docs.mongodb.org/manual/core/aggregation-introduction/>.
 
-The following lines will do the job of getting the distribution of all cell towers in the data. It is done by first grouping the cell towers by their `cell_id` and then counting the frequency of each `cell_id` by using the `$sum` operator. We then sort the cell towers by frequency in descending order (using the `$sort` operator). Note that this pipeline is constructed using the JSON format, which is then converted into BSON and read by MongoDB. The retrieved list is finally converted into a data frame for analytical convenience.
+The following lines will do the job of getting the distribution of all cell towers in the data. It is done by first grouping the cell towers by their `cell_id` and then counting the frequency of each `cell_id` by using the `$sum` operator. We then sort the cell towers by frequency in descending order (using the `$sort` operator). Notice that this pipeline is constructed using JSON format, which is then converted into BSON format and read by MongoDB. The retrieved list is finally converted into a data frame for analytical convenience.
 
 ```{r query_distribution}
 ## WARNING: This may take some time
@@ -172,6 +178,33 @@ We are now ready to plot the distribution of the cell tower location frequencies
   scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
 ```
 
+Finally, we also wish to know the distribution of IMEI's -- which can be done similarly as above. Beware that if an IMEI (or `caller_id` or `callee_id` for that matter) has a phenomenally large call volumne, that might be a call center and not a real person. (And we are only interested in real people.) We first ask the question: How many distinc IMEI's are there in the dataset? We have made such a query before, let's try to do it again.
+
+```{r distinch_imeis}
+all.imeis <- mongo.distinct(mongo, namespace, "imei")
+## This query results in an error because the returned list will be TOO BIG!
+```
+
+Note that this query wouldn't work if the result list is way too big to be returned. This is because MongoDB implements a cap of 16MB on the returned BSON document, see <http://docs.mongodb.org/manual/reference/limits/>. We will walk around this using the aggregation framework (and this kind of query will be very useful in the project as you'd have to retrieve large quantities of data over the network).
+
+``` {r num_imeis}
+pipe_1 <- mongo.bson.from.JSON(
+  '{"$group":
+    {"_id": "$imei", "count": {"$sum": 1}}
+  }'
+)
+pipe_2 <- mongo.bson.from.JSON(
+  '{"$group":
+    {"_id": 1, "count": {"$sum": 1}}
+  }'
+)
+pipeline <- list(pipe_1, pipe_2)
+## This query will take some time
+(num.imeis <- mongo.aggregation(mongo, namespace, pipeline))
+```
+
+The result says that our collection has 2,331,947 unique IMEI's. Now can you query for the list of all IMEI's (or `caller_id`, `callee_id`) and retain those with high enough call volume only? These individuals will be the basis of our **social network**.
+
 This is the end of the tutorial. You should repeat the same process to explore the other two collections: `taxi` and `income` in the `admin` databse (by changing the `collection` variable correspondingly). Remember to change the corresponding field names as well. E-mail me should you encounter any problems. Have fun exploring!
 
 **PS:** It is always a good practice to close and destroy the current `mongo` connection at the end of each session to release any network resources that might be attached to it.
@@ -181,7 +214,7 @@ mongo.disconnect(mongo)
 mongo.destroy(mongo)
 ```
 
-The following are good **online resources** to learn about and `rmongodb` (and MongoDB in general):
+The following are good **online resources** to learn about `rmongodb` (and MongoDB in general):
 
 * <http://cran.r-project.org/web/packages/rmongodb/vignettes/rmongodb_introduction.html>
 * <https://gist.github.com/Btibert3/7751989#file-rmongodb-tutorial-md>
