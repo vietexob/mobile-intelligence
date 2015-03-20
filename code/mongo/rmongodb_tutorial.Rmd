@@ -27,7 +27,7 @@ library(scales) ## for plot formatting
 library(plyr)
 ```
 
-We then declare the following variables for the server name and login credentials, which will allow you to retrieve the data from the server and make queries, but not writing to the server.
+We then declare the following variables for the server name and login credentials, which allow you to retrieve the data from the server and make queries, but not writing to the server.
 
 ```{r login_credentials, results='hide'}
 host <- "heinz-tjle.heinz.cmu.edu"
@@ -42,7 +42,7 @@ You are now ready to connect to the server. Do it by typing:
 mongo <- mongo.create(host = host, db = db, username = username, password = password)
 ```
 
-Under normal circumstances, the connection will be successful and nothing will be printed out. Otherwise, an error message will appear. Our connection variable is called `mongo` and will be used througout the session. To comfirm that we have successfully connected to the server, use the following command, and the result will be printed out.
+Under normal circumstances, the connection will be successful and nothing will be printed out. Otherwise, an error message will appear. Our connection variable is called `mongo` and will be used throughout the session. To confirm that we have successfully connected to the server, use the following command, and the result will be printed out.
 
 ```{r confirm_connection}
 mongo.is.connected(mongo)
@@ -55,7 +55,7 @@ collection <- "cellular" ## we are using the mobile phone data for now
 namespace <- paste(db, collection, sep=".")
 ```
 
-Note that we are using the `cellular` collection througout this tutorial. The other two collections can be accessed similarly. We are now ready to make our first query. Before we do that, we wish to know what collections are there in the database?
+Note that we are using the `cellular` collection throughout this tutorial. The other two collections can be accessed similarly. We are now ready to make our first query. Before we do that, we wish to know what collections are there in the database?
 
 ```{r show_collections}
 mongo.get.database.collections(mongo, db="admin")
@@ -132,8 +132,8 @@ Now we are curious about the **cell towers**. Remember that each cell tower is a
 all.locs <- mongo.distinct(mongo, namespace, "cell_id")
 ## Convert from list to vector
 loc.vector <- unlist(all.locs)
-## Take a look at the first 10 cell_id's
-head(loc.vector, 10)
+## Take a look at the first 15 cell_id's
+head(loc.vector, 15)
 ## How many locations are there?
 length(loc.vector)
 ```
@@ -178,9 +178,9 @@ We are now ready to plot the distribution of the cell tower location frequencies
   scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
 ```
 
-Finally, we also wish to know the distribution of IMEI's -- which can be done similarly as above. Beware that if an IMEI (or `caller_id` or `callee_id` for that matter) has a phenomenally large call volumne, that might be a call center and not a real person. (And we are only interested in real people.) We first ask the question: How many distinc IMEI's are there in the dataset? We have made such a query before, let's try to do it again.
+Finally, we also wish to know the distribution of IMEI's -- which can be done similarly as above. Beware that if an IMEI (or `caller_id` or `callee_id` for that matter) has a phenomenally large call volume, that might be a call center and not a real person. (And we are only interested in real people in our project.) We first ask the question: How many distinct IMEI's are there in the dataset? We have made such a query before; let's try to do it again.
 
-```{r distinch_imeis}
+```{r distinct_imeis}
 all.imeis <- mongo.distinct(mongo, namespace, "imei")
 ## This query results in an error because the returned list will be TOO BIG!
 ```
@@ -192,9 +192,9 @@ pipe_1 <- mongo.bson.from.JSON(
   '{"$group":
     {"_id": "$imei", "count": {"$sum": 1}}
   }'
-)
+) 
 pipe_2 <- mongo.bson.from.JSON(
-  '{"$group":
+   '{"$group":
     {"_id": 1, "count": {"$sum": 1}}
   }'
 )
@@ -203,9 +203,9 @@ pipeline <- list(pipe_1, pipe_2)
 (num.imeis <- mongo.aggregation(mongo, namespace, pipeline))
 ```
 
-The result says that our collection has 2,331,947 unique IMEI's. Now can you query for the list of all IMEI's (or `caller_id`, `callee_id`) and retain those with high enough call volume only? These individuals will be the basis of our **social network**.
+The result says that our collection has 2,331,947 unique IMEI's. Now can you query for the list of all IMEI's (or `caller_id`, `callee_id`) and retain those with *high enough* call volume only? These individuals will be the basis of our **social network**.
 
-This is the end of the tutorial. You should repeat the same process to explore the other two collections: `taxi` and `income` in the `admin` databse (by changing the `collection` variable correspondingly). Remember to change the corresponding field names as well. E-mail me should you encounter any problems. Have fun exploring!
+This is the end of the tutorial. You should repeat the same process to explore the other two collections: `taxi` and `income` in the `admin` database (by changing the `collection` variable correspondingly). Remember to change the corresponding field names as well. E-mail me should you encounter any problems. Have fun exploring!
 
 **PS:** It is always a good practice to close and destroy the current `mongo` connection at the end of each session to release any network resources that might be attached to it.
 
