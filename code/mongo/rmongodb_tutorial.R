@@ -30,11 +30,10 @@ mongo.get.database.collections(mongo, db="admin")
 ## Count the number of docs (rows) we have in a collection
 mongo.count(mongo, namespace)
 
-## Query the data
 ## Sample the data to see what we have
-(tmp <- mongo.find.one(mongo, namespace))
+(sample <- mongo.find.one(mongo, namespace))
 ## Convert BSON object to a list
-tmp.list <- mongo.bson.to.list(tmp)
+sample.list <- mongo.bson.to.list(sample)
 
 ## Define the query
 query <- mongo.bson.from.list(list('date'=20080301))
@@ -51,7 +50,6 @@ fields <- mongo.bson.from.buffer(fields)
 
 ## Create the query cursor, limit to 100 rows only
 cursor <- mongo.find(mongo, namespace, query=query, fields=fields, limit=100L)
-
 ## Iterate over the cursor
 call.data <- data.frame(stringsAsFactors=FALSE)
 while(mongo.cursor.next(cursor)) {
@@ -75,8 +73,6 @@ loc <- mongo.distinct(mongo, namespace, "cell_id")
 loc <- unlist(loc)
 ## Convert from hex into decimal
 loc.dec <- strtoi(loc, 16L)
-## Get the distribution of tower locations -- not the best way
-mongo.count(mongo, namespace, list(cell_id=toString(loc[1])))
 
 ## Use the aggregation framework to find the distribution of all cell towers
 pipe_1 <- mongo.bson.from.JSON(
@@ -105,6 +101,7 @@ dloc.distr.top <- head(dloc.distr, 10)
   geom_bar(stat = "identity", color = "white") + xlab("cell_id") + ylab("freq") +
    ggtitle("Top 10 Locations by Frequency"))
 
+## Plot the histogram of the cell tower locations
 (ggplot(dloc.distr, aes(freq)) + geom_histogram(binwidth=50, fill="#c0392b", alpha=0.75) +
   fivethirtyeight_theme() +
   labs(title="Distribution of Cell Tower Frequencies",
