@@ -4,14 +4,17 @@ source("./code/sna/plfit.R")
 
 load("./data/sna/userId_map_reverse.RData")
 
+## In this dataset, there are expert 728 users who reply to questions posted by 8,895 users
 weightedEdges <- read.csv(file = "./data/sna/weighted_edges.csv", header = TRUE)
 
 # Construct the graph object
-weightedEdges.matrix <- as.matrix(weightedEdges[, -3]) # remove the 'freq' column from the matrix
+# First remove the 'freq' column from the matrix
+weightedEdges.matrix <- as.matrix(weightedEdges[, -3])
+## The graph has 8,908 nodes (or unique users)
 g <- graph.edgelist(weightedEdges.matrix, directed = TRUE)
 E(g)$weight <- weightedEdges$freq # add weights to the edges
 
-# Add userId to the nodes
+# Name each node with corresponding userId
 all.userIds <- vector()
 for(nodeId in 1:length(V(g))) {
   nodeIdStr <- toString(nodeId)
@@ -24,15 +27,16 @@ for(nodeId in 1:length(V(g))) {
 }
 V(g)$userId <- all.userIds
 
-# Degree Distributions Using iGraph -- all degrees, indegree, and outdegree
+# Degree Distributions Using igraph -- all degrees, indegree, and outdegree
 summary(g) # print some basic info about the graph -- g is a weighted graph!
+
 # Obtain the undirected degree distribution
 degrees <- degree(g, mode = "all")
-degrees <- subset(degrees, degrees != 0) # remove all zero degrees
+degrees <- subset(degrees, degrees > 0) # remove all zero degrees
 indegrees <- degree(g, mode = "in")
-indegrees <- subset(indegrees, indegrees != 0)
+indegrees <- subset(indegrees, indegrees > 0)
 outdegrees <- degree(g, mode = "out")
-outdegrees <- subset(outdegrees, outdegrees != 0)
+outdegrees <- subset(outdegrees, outdegrees > 0)
 
 # Fit the power-law distribution
 pl <- plfit(degrees)
@@ -72,9 +76,11 @@ pdf(file = "./figures/sna/all_deg_dist_pl.pdf")
 op <- par(mfrow = c(2, 1))
 options(scipen = 10)
 # Histogram & cumulative dist function
-hist(degrees, freq = FALSE, xlab = "Degree k", main = "Histogram of All Degrees", breaks = 50, col = "gray")
+hist(degrees, freq = FALSE, xlab = "Degree k",
+     main = "Histogram of All Degrees", breaks = 50, col = "gray")
 mainStr <- "Degree Power-law Distribution"
-plot(x, cumy, log = "xy", xlab = "Degree k", ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr)
+plot(x, cumy, log = "xy", xlab = "Degree k",
+     ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr)
 # Overlay the fitted distribution
 startval <- cumy[pl$xmin]
 fittedvals <- (pl$xmin:max(x))^(-pl$alpha + 1) * (startval) / pl$xmin^(-pl$alpha + 1)
@@ -90,9 +96,11 @@ op <- par(mfrow = c(2, 2))
 options(scipen = 10)
 
 # Histogram & cumulative dist function
-hist(indegrees, freq = FALSE, xlab = "Indegree k", main = "Histogram of Indegrees", breaks = 50, col = "gray")
+hist(indegrees, freq = FALSE, xlab = "Indegree k",
+     main = "Histogram of Indegrees", breaks = 50, col = "gray")
 mainStr.in <- "Indegree Power-law Distr."
-plot(x.in, cumy.in, log = "xy", xlab = "Indegree k", ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr.in)
+plot(x.in, cumy.in, log = "xy", xlab = "Indegree k",
+     ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr.in)
 
 # Overlay the fitted distribution
 startval.in <- cumy.in[pl.in$xmin]
@@ -104,9 +112,11 @@ alpha.in <- pl.in$alpha
 text(60, .50, labels = bquote(paste(alpha, " = ", .(alpha.in))), col = "red", pos = 1)
 
 # Histogram & cumulative dist function
-hist(outdegrees, freq = FALSE, xlab = "Outdegree k", main = "Histogram of Outdegrees", breaks = 50, col = "gray")
+hist(outdegrees, freq = FALSE, xlab = "Outdegree k",
+     main = "Histogram of Outdegrees", breaks = 50, col = "gray")
 mainStr.out <- "Outdegree Power-law Distr."
-plot(x.out, cumy.out, log = "xy", xlab = "Outdegree k", ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr.out)
+plot(x.out, cumy.out, log = "xy", xlab = "Outdegree k",
+     ylab = expression(Pr(x) >= k), cex = 0.5, main = mainStr.out)
 
 # Overlay the fitted distribution
 startval.out <- cumy.out[pl.out$xmin]

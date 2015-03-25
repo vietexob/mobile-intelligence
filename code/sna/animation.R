@@ -1,10 +1,10 @@
 # Author: Jeff Hemsley jhemsley at uw dot edu
 # Created: Nov 20 2012
 
-# File generates random graph with random dates and creates set of pngs for animation
+# Generating random graph with random dates and creates set of pngs for animation
 library(igraph)
 
-# igraph has many nifty ways to generate random graphs. :-)
+# igraph has many nifty ways to generate random graphs
 start.nodes <- 2
 total.nodes <- 500
 g <- erdos.renyi.game(start.nodes, 1/2, directed=T)
@@ -57,7 +57,6 @@ alpha.vec.length <- length(alpha.vec.default)
 
 # workhorse loop
 for (time.step in 1:num.time.steps) {
-  
   # look.back needs to be altered at the early part of the animation
   look.back <- time.step - look.back.default
   if (look.back < 0) {
@@ -97,7 +96,7 @@ for (time.step in 1:num.time.steps) {
   
   # file names should be the same except with an incremented number. 
   # many other R-animation authors use ffmpeg 
-  out.file.name <- paste("./figures/NetAnimation_", time.step, ".png", sep="")
+  out.file.name <- paste("./figures/sna/NetAnimation_", time.step, ".png", sep="")
   png(out.file.name, width=640, height=480)
   plot.igraph(g, edge.arrow.size=0, edge.arrow.width=0, edge.curved = .5, main="")
   dev.off()

@@ -1,5 +1,3 @@
-# Coursera SNA optional Programming Assignment 2 template
-
 # load the igraph library
 # you may have to install this module if you haven't already
 library(igraph)

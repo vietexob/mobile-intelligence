@@ -11,41 +11,27 @@ getTransitionMatrix <- function(trajec.data, is.joint=FALSE) {
   rownames(trans.matrix) <- from.attrNames
   colnames(trans.matrix) <- to.attrNames
   
-  exist.test <- TRUE
-#   for(i in 1:from.len) {
-#     attrId <- from.attrNames[i]
-#     if(!(attrId %in% to.attrNames)) {
-#       exist.test <- FALSE
-#       break
-#     }
-#   }
-#   
-  if(exist.test) {
-    for(i in 1:nrow(edges)) { # go through each row of the weighted edges
-      from <- edges$fromAttrId[i]
-      to <- edges$toAttrId[i]
-      weight <- edges$Freq[i]
-      
-      for(row in 1:from.len) {
-        isFound <- FALSE
-        if(from.attrNames[row] == from) {
-          for(col in 1:to.len) {
-            if(to.attrNames[col] == to) {
-              trans.matrix[row, col] <- weight
-              isFound <- TRUE
-              break
-            }
+  for(i in 1:nrow(edges)) { # go through each row of the weighted edges
+    from <- edges$fromAttrId[i]
+    to <- edges$toAttrId[i]
+    weight <- edges$Freq[i]
+    
+    for(row in 1:from.len) {
+      isFound <- FALSE
+      if(from.attrNames[row] == from) {
+        for(col in 1:to.len) {
+          if(to.attrNames[col] == to) {
+            trans.matrix[row, col] <- weight
+            isFound <- TRUE
+            break
           }
         }
-        
-        if(isFound) {
-          break
-        }
+      }
+      
+      if(isFound) {
+        break
       }
     }
-  }
-  else {
-    stop(paste("Unexpected input. AttrId does not exist:", attrId))
   }
   
   no.trans <- sum(trans.matrix) # total number of transitions

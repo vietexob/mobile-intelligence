@@ -2,6 +2,7 @@ rm(list = ls())
 
 source("./code/sna/plfit.R")
 
+## This dataset is the result of network structure analysis
 load("./data/sna/stackoverflow_graph.RData")
 load("./data/sna/userId_map_reverse.RData")
 
@@ -133,9 +134,14 @@ print(sizes(imc))
 # Find the nodes in the largest clique
 print("UserId's in the largest clique:")
 largestClique <- V(g)[largest.cliques(as.undirected(g))[[1]]]
-for(i in 1:length(largestClique)) {
-  nodeIdStr <- toString(largestClique[[i]])
-  userIdStr <- userId.map.reverse[[nodeIdStr]]
+## Convert to string
+largestCliqueStr <- toString(largestClique)
+## Split the string by comma
+largestCliqueStr <- strsplit(largestCliqueStr, ",")
+## Convert to vector of strings
+largestCliqueStr <- largestCliqueStr[[1]]
+for(i in 1:length(largestCliqueStr)) {
+  userIdStr <- largestCliqueStr[i]
   print(userIdStr)
 }
 

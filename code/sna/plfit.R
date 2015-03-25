@@ -1,7 +1,3 @@
-###############################################################################
-#
-# Libraries
-# 
 library(VGAM)   # zeta function
 ###############################################################################
 #
@@ -104,7 +100,8 @@ library(VGAM)   # zeta function
 #    which skips values xmin with finite size bias > 0.1.
 #
 ###############################################################################
-plfit<-function(x=rpareto(1000,10,2.5),method="limit",value=c(),finite=FALSE,nowarn=FALSE,nosmall=FALSE){
+plfit<-function(x=rpareto(1000,10,2.5),method="limit",value=c(),finite=FALSE,
+                nowarn=FALSE,nosmall=FALSE){
    #init method value to NULL	
    vec <- c() ; sampl <- c() ; limit <- c(); fixed <- c()
 ###########################################################################################

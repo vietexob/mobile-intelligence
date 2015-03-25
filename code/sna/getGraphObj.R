@@ -1,5 +1,6 @@
 getGraphObj <- function(weightedEdges) {
   # Construct & returns the iGraph object from the weightedEdges data frame
+  require(igraph)
   
   freq <- weightedEdges$Freq
   # Remove the less frequent edges
