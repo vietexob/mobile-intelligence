@@ -34,6 +34,9 @@ V(g)$userId <- all.userIds
 
 # Degree distributions using igraph -- all degrees, indegree, and outdegree
 summary(g) # print some basic info about the graph -- g is a weighted graph!
+## Global clustering coefficient
+print("Global clustering coefficient of g:")
+print(transitivity(g, type="global"))
 
 # Obtain the undirected degree distribution
 degrees <- degree(g, mode = "all")
