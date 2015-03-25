@@ -1,13 +1,18 @@
 rm(list = ls())
 
+library(igraph)
 source("./code/sna/plfit.R")
+source("./code/sna/getGraphObj.R")
 
+## Load the mapping between nodeId and userId
 load("./data/sna/userId_map_reverse.RData")
 
 ## In this dataset, there are expert 728 users who reply to questions posted by 8,895 users
 weightedEdges <- read.csv(file = "./data/sna/weighted_edges.csv", header = TRUE)
 
 # Construct the graph object
+# g <- getGraphObj(weightedEdges) # alternative way
+
 # First remove the 'freq' column from the matrix
 weightedEdges.matrix <- as.matrix(weightedEdges[, -3])
 ## The graph has 8,908 nodes (or unique users)
@@ -27,7 +32,7 @@ for(nodeId in 1:length(V(g))) {
 }
 V(g)$userId <- all.userIds
 
-# Degree Distributions Using igraph -- all degrees, indegree, and outdegree
+# Degree distributions using igraph -- all degrees, indegree, and outdegree
 summary(g) # print some basic info about the graph -- g is a weighted graph!
 
 # Obtain the undirected degree distribution

@@ -16,7 +16,7 @@ summary(g)
 # obtain the undirected degree distribution (the GML file itself is directed)
 degrees = degree(g,mode="all")
 
-# fit the power-law distribution. If $D < 0.05, the Kolmogorov Smirnov test tells 
+# Fit the power-law distribution. If D < 0.05, the Kolmogorov Smirnov test tells 
 # us that the distribution is power-law.
 # Also, look for the estimated power-law exponent $alpha and $xmin (the point at 
 # which you should start fitting the distribution)

@@ -1,15 +1,15 @@
 getGraphObj <- function(weightedEdges) {
-  # Construct & returns the iGraph object from the weightedEdges data frame
+  # Construct & returns the igraph object from the weightedEdges data frame
   require(igraph)
   
-  freq <- weightedEdges$Freq
+  freq <- weightedEdges$freq
   # Remove the less frequent edges
   summ.freq <- summary(freq)
   first.quartile <- as.numeric(summ.freq[2])
-  weightedEdges <- subset(weightedEdges, Freq > first.quartile)
-  freq <- weightedEdges$Freq
+  weightedEdges <- subset(weightedEdges, freq > first.quartile)
+  freq <- weightedEdges$freq
   
-  weightedEdges.matrix <- as.matrix(weightedEdges[, -3]) # remove the 'Freq' column
+  weightedEdges.matrix <- as.matrix(weightedEdges[, -3]) # remove the 'freq' column
   g <- graph.edgelist(weightedEdges.matrix, directed = TRUE)
   E(g)$weight <- freq # add weights to the edges
   
