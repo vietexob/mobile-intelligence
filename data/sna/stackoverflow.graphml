@@ -4,812 +4,610 @@
          xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
-  <key id="v_reputation" for="node" attr.name="reputation" attr.type="double"/>
   <key id="v_userId" for="node" attr.name="userId" attr.type="double"/>
   <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
   <graph id="G" edgedefault="directed">
     <node id="n0">
-      <data key="v_reputation">63611</data>
       <data key="v_userId">13</data>
     </node>
     <node id="n1">
-      <data key="v_reputation">22049</data>
       <data key="v_userId">17</data>
     </node>
     <node id="n2">
-      <data key="v_reputation">5107</data>
       <data key="v_userId">64</data>
     </node>
     <node id="n3">
-      <data key="v_reputation">50472</data>
       <data key="v_userId">91</data>
     </node>
     <node id="n4">
-      <data key="v_reputation">13713</data>
       <data key="v_userId">115</data>
     </node>
     <node id="n5">
-      <data key="v_reputation">3848</data>
       <data key="v_userId">204</data>
     </node>
     <node id="n6">
-      <data key="v_reputation">35085</data>
       <data key="v_userId">234</data>
     </node>
     <node id="n7">
-      <data key="v_reputation">88519</data>
       <data key="v_userId">267</data>
     </node>
     <node id="n8">
-      <data key="v_reputation">9803</data>
       <data key="v_userId">287</data>
     </node>
     <node id="n9">
-      <data key="v_reputation">12021</data>
       <data key="v_userId">377</data>
     </node>
     <node id="n10">
-      <data key="v_reputation">6190</data>
       <data key="v_userId">381</data>
     </node>
     <node id="n11">
-      <data key="v_reputation">21772</data>
       <data key="v_userId">493</data>
     </node>
     <node id="n12">
-      <data key="v_reputation">7703</data>
       <data key="v_userId">543</data>
     </node>
     <node id="n13">
-      <data key="v_reputation">31926</data>
       <data key="v_userId">572</data>
     </node>
     <node id="n14">
-      <data key="v_reputation">586</data>
       <data key="v_userId">11384</data>
     </node>
     <node id="n15">
-      <data key="v_reputation">3029</data>
       <data key="v_userId">11755</data>
     </node>
     <node id="n16">
-      <data key="v_reputation">24643</data>
       <data key="v_userId">658</data>
     </node>
     <node id="n17">
-      <data key="v_reputation">13756</data>
       <data key="v_userId">672</data>
     </node>
     <node id="n18">
-      <data key="v_reputation">1071</data>
       <data key="v_userId">686</data>
     </node>
     <node id="n19">
-      <data key="v_reputation">11892</data>
       <data key="v_userId">718</data>
     </node>
     <node id="n20">
-      <data key="v_reputation">11989</data>
       <data key="v_userId">736</data>
     </node>
     <node id="n21">
-      <data key="v_reputation">8601</data>
       <data key="v_userId">810</data>
     </node>
     <node id="n22">
-      <data key="v_reputation">33207</data>
       <data key="v_userId">813</data>
     </node>
     <node id="n23">
-      <data key="v_reputation">21269</data>
       <data key="v_userId">825</data>
     </node>
     <node id="n24">
-      <data key="v_reputation">732</data>
       <data key="v_userId">15948</data>
     </node>
     <node id="n25">
-      <data key="v_reputation">846</data>
       <data key="v_userId">16977</data>
     </node>
     <node id="n26">
-      <data key="v_reputation">13469</data>
       <data key="v_userId">914</data>
     </node>
     <node id="n27">
-      <data key="v_reputation">1940</data>
       <data key="v_userId">1013</data>
     </node>
     <node id="n28">
-      <data key="v_reputation">43152</data>
       <data key="v_userId">1053</data>
     </node>
     <node id="n29">
-      <data key="v_reputation">18001</data>
       <data key="v_userId">1060</data>
     </node>
     <node id="n30">
-      <data key="v_reputation">13647</data>
       <data key="v_userId">1116</data>
     </node>
     <node id="n31">
-      <data key="v_reputation">133</data>
       <data key="v_userId">29600</data>
     </node>
     <node id="n32">
-      <data key="v_reputation">6487</data>
       <data key="v_userId">1185</data>
     </node>
     <node id="n33">
-      <data key="v_reputation">16424</data>
       <data key="v_userId">1190</data>
     </node>
     <node id="n34">
-      <data key="v_reputation">4974</data>
       <data key="v_userId">1247</data>
     </node>
     <node id="n35">
-      <data key="v_reputation">88276</data>
       <data key="v_userId">1288</data>
     </node>
     <node id="n36">
-      <data key="v_reputation">46</data>
       <data key="v_userId">36107</data>
     </node>
     <node id="n37">
-      <data key="v_reputation">4147</data>
       <data key="v_userId">1304</data>
     </node>
     <node id="n38">
-      <data key="v_reputation">12961</data>
       <data key="v_userId">1343</data>
     </node>
     <node id="n39">
-      <data key="v_reputation">202</data>
       <data key="v_userId">47204</data>
     </node>
     <node id="n40">
-      <data key="v_reputation">6346</data>
       <data key="v_userId">1428</data>
     </node>
     <node id="n41">
-      <data key="v_reputation">2933</data>
       <data key="v_userId">1492</data>
     </node>
     <node id="n42">
-      <data key="v_reputation">7941</data>
       <data key="v_userId">1638</data>
     </node>
     <node id="n43">
-      <data key="v_reputation">27762</data>
       <data key="v_userId">1694</data>
     </node>
     <node id="n44">
-      <data key="v_reputation">36560</data>
       <data key="v_userId">1695</data>
     </node>
     <node id="n45">
-      <data key="v_reputation">32451</data>
       <data key="v_userId">1786</data>
     </node>
     <node id="n46">
-      <data key="v_reputation">15249</data>
       <data key="v_userId">1821</data>
     </node>
     <node id="n47">
-      <data key="v_reputation">27001</data>
       <data key="v_userId">1862</data>
     </node>
     <node id="n48">
-      <data key="v_reputation">41203</data>
       <data key="v_userId">1965</data>
     </node>
     <node id="n49">
-      <data key="v_reputation">143141</data>
       <data key="v_userId">1968</data>
     </node>
     <node id="n50">
-      <data key="v_reputation">11997</data>
       <data key="v_userId">2238</data>
     </node>
     <node id="n51">
-      <data key="v_reputation">45189</data>
       <data key="v_userId">2424</data>
     </node>
     <node id="n52">
-      <data key="v_reputation">7600</data>
       <data key="v_userId">2547</data>
     </node>
     <node id="n53">
-      <data key="v_reputation">6580</data>
       <data key="v_userId">2567</data>
     </node>
     <node id="n54">
-      <data key="v_reputation">40425</data>
       <data key="v_userId">2598</data>
     </node>
     <node id="n55">
-      <data key="v_reputation">4711</data>
       <data key="v_userId">2849</data>
     </node>
     <node id="n56">
-      <data key="v_reputation">36812</data>
       <data key="v_userId">2915</data>
     </node>
     <node id="n57">
-      <data key="v_reputation">16730</data>
       <data key="v_userId">2974</data>
     </node>
     <node id="n58">
-      <data key="v_reputation">131114</data>
       <data key="v_userId">3043</data>
     </node>
     <node id="n59">
-      <data key="v_reputation">2140</data>
       <data key="v_userId">3111</data>
     </node>
     <node id="n60">
-      <data key="v_reputation">37441</data>
       <data key="v_userId">3146</data>
     </node>
     <node id="n61">
-      <data key="v_reputation">88669</data>
       <data key="v_userId">3153</data>
     </node>
     <node id="n62">
-      <data key="v_reputation">8900</data>
       <data key="v_userId">3279</data>
     </node>
     <node id="n63">
-      <data key="v_reputation">19296</data>
       <data key="v_userId">3295</data>
     </node>
     <node id="n64">
-      <data key="v_reputation">58869</data>
       <data key="v_userId">3333</data>
     </node>
     <node id="n65">
-      <data key="v_reputation">5471</data>
       <data key="v_userId">3355</data>
     </node>
     <node id="n66">
-      <data key="v_reputation">7829</data>
       <data key="v_userId">3458</data>
     </node>
     <node id="n67">
-      <data key="v_reputation">76362</data>
       <data key="v_userId">3474</data>
     </node>
     <node id="n68">
-      <data key="v_reputation">13640</data>
       <data key="v_userId">3508</data>
     </node>
     <node id="n69">
-      <data key="v_reputation">2208</data>
       <data key="v_userId">3821</data>
     </node>
     <node id="n70">
-      <data key="v_reputation">35805</data>
       <data key="v_userId">4086</data>
     </node>
     <node id="n71">
-      <data key="v_reputation">17577</data>
       <data key="v_userId">4200</data>
     </node>
     <node id="n72">
-      <data key="v_reputation">26525</data>
       <data key="v_userId">4203</data>
     </node>
     <node id="n73">
-      <data key="v_reputation">48018</data>
       <data key="v_userId">4279</data>
     </node>
     <node id="n74">
-      <data key="v_reputation">14325</data>
       <data key="v_userId">4642</data>
     </node>
     <node id="n75">
-      <data key="v_reputation">7118</data>
       <data key="v_userId">4737</data>
     </node>
     <node id="n76">
-      <data key="v_reputation">8735</data>
       <data key="v_userId">4761</data>
     </node>
     <node id="n77">
-      <data key="v_reputation">14650</data>
       <data key="v_userId">4872</data>
     </node>
     <node id="n78">
-      <data key="v_reputation">6433</data>
       <data key="v_userId">4916</data>
     </node>
     <node id="n79">
-      <data key="v_reputation">20657</data>
       <data key="v_userId">4918</data>
     </node>
     <node id="n80">
-      <data key="v_reputation">19669</data>
       <data key="v_userId">4977</data>
     </node>
     <node id="n81">
-      <data key="v_reputation">21947</data>
       <data key="v_userId">5023</data>
     </node>
     <node id="n82">
-      <data key="v_reputation">69855</data>
       <data key="v_userId">5190</data>
     </node>
     <node id="n83">
-      <data key="v_reputation">7445</data>
       <data key="v_userId">5291</data>
     </node>
     <node id="n84">
-      <data key="v_reputation">12446</data>
       <data key="v_userId">5346</data>
     </node>
     <node id="n85">
-      <data key="v_reputation">7027</data>
       <data key="v_userId">5791</data>
     </node>
     <node id="n86">
-      <data key="v_reputation">2762</data>
       <data key="v_userId">5802</data>
     </node>
     <node id="n87">
-      <data key="v_reputation">8847</data>
       <data key="v_userId">6276</data>
     </node>
     <node id="n88">
-      <data key="v_reputation">231365</data>
       <data key="v_userId">6309</data>
     </node>
     <node id="n89">
-      <data key="v_reputation">10655</data>
       <data key="v_userId">6335</data>
     </node>
     <node id="n90">
-      <data key="v_reputation">67069</data>
       <data key="v_userId">6521</data>
     </node>
     <node id="n91">
-      <data key="v_reputation">8708</data>
       <data key="v_userId">7122</data>
     </node>
     <node id="n92">
-      <data key="v_reputation">3149</data>
       <data key="v_userId">7140</data>
     </node>
     <node id="n93">
-      <data key="v_reputation">13121</data>
       <data key="v_userId">7565</data>
     </node>
     <node id="n94">
-      <data key="v_reputation">14502</data>
       <data key="v_userId">7862</data>
     </node>
     <node id="n95">
-      <data key="v_reputation">8777</data>
       <data key="v_userId">7903</data>
     </node>
     <node id="n96">
-      <data key="v_reputation">14002</data>
       <data key="v_userId">9236</data>
     </node>
     <node id="n97">
-      <data key="v_reputation">8322</data>
       <data key="v_userId">9328</data>
     </node>
     <node id="n98">
-      <data key="v_reputation">35018</data>
       <data key="v_userId">9345</data>
     </node>
     <node id="n99">
-      <data key="v_reputation">101112</data>
       <data key="v_userId">9530</data>
     </node>
     <node id="n100">
-      <data key="v_reputation">3581</data>
       <data key="v_userId">9594</data>
     </node>
     <node id="n101">
-      <data key="v_reputation">11157</data>
       <data key="v_userId">10431</data>
     </node>
     <node id="n102">
-      <data key="v_reputation">30100</data>
       <data key="v_userId">10585</data>
     </node>
     <node id="n103">
-      <data key="v_reputation">156191</data>
       <data key="v_userId">10661</data>
     </node>
     <node id="n104">
-      <data key="v_reputation">4974</data>
       <data key="v_userId">10676</data>
     </node>
     <node id="n105">
-      <data key="v_reputation">1783</data>
       <data key="v_userId">11374</data>
     </node>
     <node id="n106">
-      <data key="v_reputation">10674</data>
       <data key="v_userId">11410</data>
     </node>
     <node id="n107">
-      <data key="v_reputation">5008</data>
       <data key="v_userId">11436</data>
     </node>
     <node id="n108">
-      <data key="v_reputation">15454</data>
       <data key="v_userId">11568</data>
     </node>
     <node id="n109">
-      <data key="v_reputation">6319</data>
       <data key="v_userId">11577</data>
     </node>
     <node id="n110">
-      <data key="v_reputation">6987</data>
       <data key="v_userId">11694</data>
     </node>
     <node id="n111">
-      <data key="v_reputation">39647</data>
       <data key="v_userId">12579</data>
     </node>
     <node id="n112">
-      <data key="v_reputation">42997</data>
       <data key="v_userId">12725</data>
     </node>
     <node id="n113">
-      <data key="v_reputation">3420</data>
       <data key="v_userId">12862</data>
     </node>
     <node id="n114">
-      <data key="v_reputation">35617</data>
       <data key="v_userId">12870</data>
     </node>
     <node id="n115">
-      <data key="v_reputation">23216</data>
       <data key="v_userId">12943</data>
     </node>
     <node id="n116">
-      <data key="v_reputation">188328</data>
       <data key="v_userId">12950</data>
     </node>
     <node id="n117">
-      <data key="v_reputation">31200</data>
       <data key="v_userId">13018</data>
     </node>
     <node id="n118">
-      <data key="v_reputation">2829</data>
       <data key="v_userId">13100</data>
     </node>
     <node id="n119">
-      <data key="v_reputation">40627</data>
       <data key="v_userId">13154</data>
     </node>
     <node id="n120">
-      <data key="v_reputation">31153</data>
       <data key="v_userId">13279</data>
     </node>
     <node id="n121">
-      <data key="v_reputation">2449</data>
       <data key="v_userId">13491</data>
     </node>
     <node id="n122">
-      <data key="v_reputation">33116</data>
       <data key="v_userId">13913</data>
     </node>
     <node id="n123">
-      <data key="v_reputation">4878</data>
       <data key="v_userId">13940</data>
     </node>
     <node id="n124">
-      <data key="v_reputation">75691</data>
       <data key="v_userId">14065</data>
     </node>
     <node id="n125">
-      <data key="v_reputation">40655</data>
       <data key="v_userId">14606</data>
     </node>
     <node id="n126">
-      <data key="v_reputation">7210</data>
       <data key="v_userId">14663</data>
     </node>
     <node id="n127">
-      <data key="v_reputation">12490</data>
       <data key="v_userId">14690</data>
     </node>
     <node id="n128">
-      <data key="v_reputation">214774</data>
       <data key="v_userId">14860</data>
     </node>
     <node id="n129">
-      <data key="v_reputation">24733</data>
       <data key="v_userId">15055</data>
     </node>
     <node id="n130">
-      <data key="v_reputation">20962</data>
       <data key="v_userId">15124</data>
     </node>
     <node id="n131">
-      <data key="v_reputation">157795</data>
       <data key="v_userId">15168</data>
     </node>
     <node id="n132">
-      <data key="v_reputation">30135</data>
       <data key="v_userId">15401</data>
     </node>
     <node id="n133">
-      <data key="v_reputation">16889</data>
       <data key="v_userId">15459</data>
     </node>
     <node id="n134">
-      <data key="v_reputation">48731</data>
       <data key="v_userId">15541</data>
     </node>
     <node id="n135">
-      <data key="v_reputation">15273</data>
       <data key="v_userId">15592</data>
     </node>
     <node id="n136">
-      <data key="v_reputation">27088</data>
       <data key="v_userId">15955</data>
     </node>
     <node id="n137">
-      <data key="v_reputation">117764</data>
       <data key="v_userId">16076</data>
     </node>
     <node id="n138">
-      <data key="v_reputation">7634</data>
       <data key="v_userId">16391</data>
     </node>
     <node id="n139">
-      <data key="v_reputation">23747</data>
       <data key="v_userId">16587</data>
     </node>
     <node id="n140">
-      <data key="v_reputation">120759</data>
       <data key="v_userId">16883</data>
     </node>
     <node id="n141">
-      <data key="v_reputation">30114</data>
       <data key="v_userId">18061</data>
     </node>
     <node id="n142">
-      <data key="v_reputation">8557</data>
       <data key="v_userId">18103</data>
     </node>
     <node id="n143">
-      <data key="v_reputation">178995</data>
       <data key="v_userId">18393</data>
     </node>
     <node id="n144">
-      <data key="v_reputation">5734</data>
       <data key="v_userId">18658</data>
     </node>
     <node id="n145">
-      <data key="v_reputation">4699</data>
       <data key="v_userId">18664</data>
     </node>
     <node id="n146">
-      <data key="v_reputation">4644</data>
       <data key="v_userId">18821</data>
     </node>
     <node id="n147">
-      <data key="v_reputation">4430</data>
       <data key="v_userId">18893</data>
     </node>
     <node id="n148">
-      <data key="v_reputation">10804</data>
       <data key="v_userId">18941</data>
     </node>
     <node id="n149">
-      <data key="v_reputation">1556</data>
       <data key="v_userId">19038</data>
     </node>
     <node id="n150">
-      <data key="v_reputation">6374</data>
       <data key="v_userId">19307</data>
     </node>
     <node id="n151">
-      <data key="v_reputation">29895</data>
       <data key="v_userId">19403</data>
     </node>
     <node id="n152">
-      <data key="v_reputation">3765</data>
       <data key="v_userId">19929</data>
     </node>
     <node id="n153">
-      <data key="v_reputation">8602</data>
       <data key="v_userId">20471</data>
     </node>
     <node id="n154">
-      <data key="v_reputation">51760</data>
       <data key="v_userId">20654</data>
     </node>
     <node id="n155">
-      <data key="v_reputation">6336</data>
       <data key="v_userId">21699</data>
     </node>
     <node id="n156">
-      <data key="v_reputation">8710</data>
       <data key="v_userId">22114</data>
     </node>
     <node id="n157">
-      <data key="v_reputation">1994</data>
       <data key="v_userId">22329</data>
     </node>
     <node id="n158">
-      <data key="v_reputation">30669</data>
       <data key="v_userId">22459</data>
     </node>
     <node id="n159">
-      <data key="v_reputation">10200</data>
       <data key="v_userId">22564</data>
     </node>
     <node id="n160">
-      <data key="v_reputation">465166</data>
       <data key="v_userId">22656</data>
     </node>
     <node id="n161">
-      <data key="v_reputation">2938</data>
       <data key="v_userId">22724</data>
     </node>
     <node id="n162">
-      <data key="v_reputation">3907</data>
       <data key="v_userId">23034</data>
     </node>
     <node id="n163">
-      <data key="v_reputation">40742</data>
       <data key="v_userId">23072</data>
     </node>
     <node id="n164">
-      <data key="v_reputation">325797</data>
       <data key="v_userId">23354</data>
     </node>
     <node id="n165">
-      <data key="v_reputation">17521</data>
       <data key="v_userId">23368</data>
     </node>
     <node id="n166">
-      <data key="v_reputation">26356</data>
       <data key="v_userId">23691</data>
     </node>
     <node id="n167">
-      <data key="v_reputation">19008</data>
       <data key="v_userId">23771</data>
     </node>
     <node id="n168">
-      <data key="v_reputation">4138</data>
       <data key="v_userId">24126</data>
     </node>
     <node id="n169">
-      <data key="v_reputation">7440</data>
       <data key="v_userId">24462</data>
     </node>
     <node id="n170">
-      <data key="v_reputation">32899</data>
       <data key="v_userId">24545</data>
     </node>
     <node id="n171">
-      <data key="v_reputation">33949</data>
       <data key="v_userId">24587</data>
     </node>
     <node id="n172">
-      <data key="v_reputation">2533</data>
       <data key="v_userId">25538</data>
     </node>
     <node id="n173">
-      <data key="v_reputation">18255</data>
       <data key="v_userId">26227</data>
     </node>
     <node id="n174">
-      <data key="v_reputation">2819</data>
       <data key="v_userId">26286</data>
     </node>
     <node id="n175">
-      <data key="v_reputation">9952</data>
       <data key="v_userId">26334</data>
     </node>
     <node id="n176">
-      <data key="v_reputation">14048</data>
       <data key="v_userId">28380</data>
     </node>
     <node id="n177">
-      <data key="v_reputation">18094</data>
       <data key="v_userId">29157</data>
     </node>
     <node id="n178">
-      <data key="v_reputation">941</data>
       <data key="v_userId">31325</data>
     </node>
     <node id="n179">
-      <data key="v_reputation">7934</data>
       <data key="v_userId">31505</data>
     </node>
     <node id="n180">
-      <data key="v_reputation">23827</data>
       <data key="v_userId">31641</data>
     </node>
     <node id="n181">
-      <data key="v_reputation">82330</data>
       <data key="v_userId">34088</data>
     </node>
     <node id="n182">
-      <data key="v_reputation">163898</data>
       <data key="v_userId">34509</data>
     </node>
     <node id="n183">
-      <data key="v_reputation">16222</data>
       <data key="v_userId">34537</data>
     </node>
     <node id="n184">
-      <data key="v_reputation">17668</data>
       <data key="v_userId">35364</data>
     </node>
     <node id="n185">
-      <data key="v_reputation">2382</data>
       <data key="v_userId">36269</data>
     </node>
     <node id="n186">
-      <data key="v_reputation">5942</data>
       <data key="v_userId">37494</data>
     </node>
     <node id="n187">
-      <data key="v_reputation">16214</data>
       <data key="v_userId">39106</data>
     </node>
     <node id="n188">
-      <data key="v_reputation">6974</data>
       <data key="v_userId">40161</data>
     </node>
     <node id="n189">
-      <data key="v_reputation">8832</data>
       <data key="v_userId">41613</data>
     </node>
     <node id="n190">
-      <data key="v_reputation">7621</data>
       <data key="v_userId">42404</data>
     </node>
     <node id="n191">
-      <data key="v_reputation">4379</data>
       <data key="v_userId">43786</data>
     </node>
     <node id="n192">
-      <data key="v_reputation">36499</data>
       <data key="v_userId">48684</data>
     </node>
     <node id="n193">
-      <data key="v_reputation">13013</data>
       <data key="v_userId">49153</data>
     </node>
     <node id="n194">
-      <data key="v_reputation">30321</data>
       <data key="v_userId">49942</data>
     </node>
     <node id="n195">
-      <data key="v_reputation">69375</data>
       <data key="v_userId">54680</data>
     </node>
     <node id="n196">
-      <data key="v_reputation">4662</data>
       <data key="v_userId">58553</data>
     </node>
     <node id="n197">
-      <data key="v_reputation">3601</data>
       <data key="v_userId">58668</data>
     </node>
     <node id="n198">
-      <data key="v_reputation">9852</data>
       <data key="v_userId">62830</data>
     </node>
     <node id="n199">
-      <data key="v_reputation">22725</data>
       <data key="v_userId">65868</data>
     </node>
     <node id="n200">
-      <data key="v_reputation">11874</data>
       <data key="v_userId">67153</data>
     </node>
     <edge source="n0" target="n7">

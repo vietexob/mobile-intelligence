@@ -1,68 +1,23 @@
-rm(list = ls())
+rm(list = ls()) # clear the workspace
 
 library(igraph)
+
+## Load the useful functions
 source("./code/sna/plfit.R")
 source("./code/sna/plotNetwork.R")
 
 ## This dataset is the result of network structure analysis
 load("./data/sna/stackoverflow_graph.RData")
+## This dataset maps from nodeId to userId
 load("./data/sna/userId_map_reverse.RData")
 
+## Load the CSV file representing the network (nodes and edges)
 weightedEdges <- read.csv(file = "./data/sna/weighted_edges.csv", header = TRUE)
 
-# Centrality measures for the nodes/users
-top <- 20
-# (1) No. of questions answered --> weighted outdegree
-# (2) Count how many people one helps --> unweighted outdegree
-nodeIdAnsCount.map <- new.env() # weighted count
-nodeIdUserCount.map <- new.env() # unweighted count
-for(i in 1:nrow(weightedEdges)) {
-  nodeIdStr <- toString(weightedEdges$fromUserId[i])
-  count <- weightedEdges$freq[i]
-  
-  if(!is.null(nodeIdAnsCount.map[[nodeIdStr]])) {
-    totalCount <- nodeIdAnsCount.map[[nodeIdStr]]
-    totalCount <- totalCount + count
-    nodeIdAnsCount.map[[nodeIdStr]] <- totalCount
-    
-    userCount <- nodeIdUserCount.map[[nodeIdStr]]
-    nodeIdUserCount.map[[nodeIdStr]] <- userCount + 1
-  }
-  else {
-    nodeIdAnsCount.map[[nodeIdStr]] <- count
-    nodeIdUserCount.map[[nodeIdStr]] <- 1
-  }
-}
-ansNodeId <- unique(weightedEdges$fromUserId)
+## Centrality measures for the nodes (users)
+top <- 20 # display the top users only
 
-ansCount <- vector()
-ansUserCount <- vector()
-for(i in 1:length(ansNodeId)) {
-  nodeIdStr <- toString(ansNodeId[i])
-  totalCount <- nodeIdAnsCount.map[[nodeIdStr]]
-  ansCount[i] <- totalCount
-  
-  userCount <- nodeIdUserCount.map[[nodeIdStr]]
-  ansUserCount[i] <- userCount
-}
-
-sorted.ansCount <- sort(ansCount, decreasing = TRUE)
-sorted.ansUserCount <- sort(ansUserCount, decreasing = TRUE)
-for(i in 1:top) {
-  index <- which(ansCount == sorted.ansCount[i])
-  nodeIdStr <- toString(ansNodeId[i])
-  userId <- userId.map.reverse[[nodeIdStr]]
-  print(paste("UserId with No. Ans #", i, ":", userId, "@", sorted.ansCount[i]))
-}
-for(i in 1:top) {
-  index <- which(ansUserCount == sorted.ansUserCount[i])
-  nodeIdStr <- toString(ansNodeId[i])
-  userId <- userId.map.reverse[[nodeIdStr]]
-  print(paste("UserId with No. Users Helped #", i, ":", userId, "@",
-              sorted.ansUserCount[i]))
-}
-
-# (3) Find directed betweenness scores for each node
+## Find directed betweenness centrality for each node
 btw <- betweenness(g, directed = TRUE)
 sorted.btw <- sort(btw, decreasing = TRUE)
 for(i in 1:top) {
@@ -72,8 +27,7 @@ for(i in 1:top) {
               round(sorted.btw[i], digits = 3)))
 }
 
-# (4) PageRank --> ExpertiseRank algorithm
-# Get the top-50 PageRanked nodes
+## PageRank centrality
 pr <- page.rank(g, directed = TRUE)
 sorted.pr <- sort(pr$vector, decreasing = TRUE)
 for(i in 1:top) {
@@ -83,7 +37,7 @@ for(i in 1:top) {
               round(sorted.pr[i], digits = 5)))
 }
 
-# (5) HITS authority algorithm
+## HITS authority algorithm
 authority <- authority.score(g)$vector
 sorted.authority <- sort(authority, decreasing = TRUE)
 for(i in 1:top) {
@@ -93,9 +47,10 @@ for(i in 1:top) {
               round(sorted.authority[i], digits = 5)))
 }
 
-# COMMUNITIES
-# Find the maximal k-core any vertex belongs to
-k.core <- graph.coreness(as.undirected(g), mode = "all")
+######### START: SKIP THIS PART FOR NOW #########
+# # COMMUNITIES
+# # Find the maximal k-core any vertex belongs to
+# k.core <- graph.coreness(as.undirected(g), mode = "all")
 
 # # InfoMap community finding algorithm (can be slow)
 # imc <- infomap.community(g)
@@ -132,11 +87,12 @@ k.core <- graph.coreness(as.undirected(g), mode = "all")
 #   userIdStr <- largestCliqueStr[i]
 #   print(userIdStr)
 # }
+######### END: SKIP THIS PART FOR NOW #########
 
-# Subset the data, exclude people who are at the periphery of the network
+## Subset the data, exclude people who are at the periphery of the network
 theta <- 45 # the threshold
 bad.nodes <- V(g)[degree(g) < theta] # low-degree nodes
 f <- delete.vertices(g, bad.nodes) # f is the new network
 
-# Save as Gephi file
+## Save as Gephi file
 write.graph(f, file = "./data/sna/stackoverflow.graphml", format = "graphml")

@@ -1,0 +1,145 @@
+---
+title: "Getting Cell Tower Locations"
+author: "[Truc Viet 'Joe' Le](mailto:tjle@andrew.cmu.edu)"
+date: "March 26, 2015"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(ig.width=6, fig.height=6, fig.path='./figures/mobile/',
+                      warning=FALSE)
+```
+
+This tutorial demonstrates how to match `cell_id`'s in the **mobile phone** dataset with their corresponding **real-world** spatial locations (i.e., longitude and latitude coordinates). Note that not all `cell_id`'s can be matched and located. Ignore those that are unmatched, which turns out to be **a lot**.
+
+First, load the useful packages as always. We will use them for retrieving the data and plotting them on a map.
+
+```{r load_packages, include=TRUE}
+library(rmongodb)
+library(ggplot2)
+library(ggmap) ## for plotting maps
+```
+
+Note that if a package is not installed, you will get an error when trying to load it. You need to install that package before you can load it. For example:
+
+```{r install_packages, eval=FALSE}
+install.packages("ggmap", dependencies=TRUE)
+```
+
+The spatial locations of the cell towers are stored in a separate CSV file. Therefore, we'll need to load it and read the cell names such that they can be matched to those `cell_id`'s in the database. The way to match those is to read only the last 4 letters of each cell name and convert it to the corresponding decimal representation (from hexadecimal).
+
+```{r read_locations}
+## Read the cell towers' spatial coordinates from the CSV file
+cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
+cell.names <- cell.towers$Cell # retrieve the cell names
+## Take only the last 4 letters for the cell names
+cell.names.short <- vector()
+for(i in 1:length(cell.names)) {
+  cell.names.short[i] <- substr(cell.names[i], start=4, stop=nchar(cell.names[i]))
+}
+## Convert from hexadecimal into decimal format
+cell.names.dec <- strtoi(cell.names.short, 16L)
+```
+
+We now connect to the remote server as we did before.
+
+```{r server_connection}
+## Login credentials
+host <- "heinz-tjle.heinz.cmu.edu"
+username <- "student"
+password <- "helloWorld"
+db <- "admin"
+## Connect to MongoDB remote server
+mongo <- mongo.create(host = host, db = db, username = username, password = password)
+## Check if we are successfully connected
+mongo.is.connected(mongo)
+## The database we're working with is 'admin' and the collection is 'cellular'
+collection <- "cellular"
+namespace <- paste(db, collection, sep=".")
+```
+
+We retrieve **all** the `cell_id`'s and convert them into hexadecimal format.
+
+```{r get_cell_id}
+## Get the cell tower locations
+cell.loc <- mongo.distinct(mongo, namespace, "cell_id")
+## Convert into vector
+cell.loc <- unlist(cell.loc)
+## Convert from hexadecimal into decimal
+cell.loc.dec <- strtoi(cell.loc, 16L)
+```
+
+We will now match each `cell.loc.dec` (i.e., the decimal representation of a `cell_id`) to a corresponding element in the `cell.names.dec` vector: they are matched if they have the same decimal number representation. We will also create a mapping (i.e., a [hash table](http://en.wikipedia.org/wiki/Hash_table)) called `cell_id.coord.rowIndex` that maps each `cell_id` in its original hexadecimal format to a corresponding row index of the `cell.towers` data frame. This will come in handy when later we wish to look up for a `cell_id`'s longitude and latitude coordinates. We will also create a data frame called `cell.loc.data` in order to visualize those locations on a map (more on that later). Finally, we also want to keep track of how many locations in our database that can be matched with the coordinates given in the CSV file. We will see that only a **very small** fraction can be matched.
+
+```{r cell_matching}
+## Create a mapping from each cell_id to the corresponding cell.towers table's row index
+cell_id.coord.rowIndex <- new.env() # this is how a hash table is declared in R
+## Create a data frame to store and visualize the locations
+cell.loc.data <- data.frame(stringsAsFactors=FALSE)
+counter <- 0 # this counter keeps track of the number of matches
+for(i in 1:length(cell.loc)) { # iterate through each retrieved cell location
+  if(cell.loc.dec[i] %in% cell.names.dec) { # check if there is a match
+    rowIndices <- which(cell.names.dec == cell.loc.dec[i]) # find the matched index
+    if(length(rowIndices) == 1) { # if there is one unique match
+      rowIndex <- rowIndices
+    }
+    else { # otherwise, matched with more than one row
+      ## Take the first one that's matched
+      rowIndex <- rowIndices[1]
+    }
+    
+    ## Get the long and lat coordinates
+    longitude <- as.numeric(cell.towers$Longitude[rowIndex])
+    latitude <- as.numeric(cell.towers$Latitude[rowIndex])
+    if(!is.na(longitude) && !is.na(latitude)) { # some of the coords are corrupted
+      cell_id.coord.rowIndex[[toString(cell.loc[i])]] <- rowIndex
+      loc.row.data <- data.frame(cell=cell.loc[i], longitude=longitude, latitude=latitude)
+      cell.loc.data <- rbind(cell.loc.data, loc.row.data)
+      counter <- counter + 1
+    }
+  }
+}
+## How much percent is matched?
+(round(counter / length(cell.loc) * 100, 2))
+```
+
+Our result shows that only 4.37% of the `cell_id`'s in our database can be matched to the real-world coordinates. That is about 2,252 unique locations, which is quite good enough to put them all on a map. But before that, I want to demonstrate how the mapping `cell_id.coord.rowIndex` can be very useful when we know a `cell_id` and we wish to quickly retrieve its coordinates.
+
+```{r get_coords}
+cell_id <- "1451" # suppose we know this cell_id
+rowIndex <- cell_id.coord.rowIndex[[cell_id]]
+(longitude <- cell.towers$Longitude[rowIndex])
+(latitude <- cell.towers$Latitude[rowIndex])
+```
+
+We are now ready to map those 2,252 locations in the `cell.loc.data` data frame using their longitude and latitude coordinates. The following code will visualize them on a static map retrieved from Google Maps.
+
+```{r get_map}
+## Retrieve a map from Google Maps with center at the means of all the coordinates
+cell.loc.map <- get_map(location = c(lon = mean(cell.loc.data$longitude),
+                                     lat = mean(cell.loc.data$latitude)),
+                        zoom = 10, scale = 2) # scale specifies the resolution of the map
+## Make a map that plots each cell tower using a little red dot
+cell.tower.pts <- geom_point(data = cell.loc.data, aes(x = longitude, y = latitude,
+                                                       fill = "red", alpha = 0.80),
+                             size = 1, shape = 21)
+## This line overlays the cell tower locations onto the retrieved map
+cell.loc.map <- ggmap(cell.loc.map) + cell.tower.pts + guides(fill = FALSE, alpha = FALSE,
+                                                              size = FALSE)
+## Give the map a title
+cell.loc.map <- cell.loc.map + ggtitle("Locations of Cell Towers")
+## Add the density contours
+cell.loc.map <- cell.loc.map + geom_density2d(data = cell.loc.data,
+                                              aes(x = longitude, y = latitude))
+## Print the map
+print(cell.loc.map)
+```
+
+Finally, if you want to save the map (image) onto disk for use later, the following code will do the job.
+
+```{r save_map}
+## Save the plot on disk, specify dimension 8x8 inches
+ggsave(filename="./figures/mobile/cell_towers.png", width=8, height=8)
+```
+
+This is the end of the tutorial. E-mail me should you run into any problems.
