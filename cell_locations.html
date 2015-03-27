@@ -69,7 +69,7 @@ img {
 
 
 <p>This tutorial demonstrates how to match <code>cell_id</code>’s in the <strong>mobile phone</strong> dataset with their corresponding <strong>real-world</strong> spatial locations (i.e., longitude and latitude coordinates). Note that not all <code>cell_id</code>’s can be matched and located. Ignore those that are unmatched, which turns out to be <strong>a lot</strong>.</p>
-<p>First, load the useful packages as always. We will use them for retrieving the data and plotting them on a map.</p>
+<p>First, make sure that you have successfully cloned the <a href="https://github.com/vietexob/mobile-intelligence">GitHub repository</a> that hosts the project. If you’re new to <strong>git</strong>, look for brief <a href="https://help.github.com/articles/fork-a-repo/">instructions here</a>. Then, go to the cloned directory, it should be named “mobile-intelligence” by default. This is <strong>important</strong>: Use <strong>RStudio</strong> to open the project file <code>mobile-intelligence.Rproj</code> in the directory. You should have now set the path correctly. Now, load the useful packages as always. We will use them for retrieving the data and plotting them on a map.</p>
 <pre class="r"><code>library(rmongodb)
 library(ggplot2)
 library(ggmap) ## for plotting maps</code></pre>

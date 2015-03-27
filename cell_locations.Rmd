@@ -12,7 +12,7 @@ knitr::opts_chunk$set(ig.width=6, fig.height=6, fig.path='./figures/mobile/',
 
 This tutorial demonstrates how to match `cell_id`'s in the **mobile phone** dataset with their corresponding **real-world** spatial locations (i.e., longitude and latitude coordinates). Note that not all `cell_id`'s can be matched and located. Ignore those that are unmatched, which turns out to be **a lot**.
 
-First, load the useful packages as always. We will use them for retrieving the data and plotting them on a map.
+First, make sure that you have successfully cloned the [GitHub repository](https://github.com/vietexob/mobile-intelligence) that hosts the project. If you're new to **git**, look for brief [instructions here](https://help.github.com/articles/fork-a-repo/). Then, go to the cloned directory, it should be named "mobile-intelligence" by default. This is **important**: Use **RStudio** to open the project file `mobile-intelligence.Rproj` in the directory. You should have now set the path correctly. Now, load the useful packages as always. We will use them for retrieving the data and plotting them on a map.
 
 ```{r load_packages, include=TRUE}
 library(rmongodb)
