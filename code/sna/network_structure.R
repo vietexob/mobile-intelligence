@@ -13,7 +13,7 @@ load("./data/sna/userId_map_reverse.RData")
 ## Each node in the network is a unique user on the website. There is a directed edge from
 ## user u to user v if u has answered at least one question posted by v on the website. The
 ## weight of a directed edge represents the number of questions a user has answered another.
-## In this dataset, there are expert 728 users who reply to questions posted by 8,895 users.
+## In this dataset, there are 728 expert users who reply to questions posted by 8,895 users.
 weightedEdges <- read.csv(file = "./data/sna/weighted_edges.csv", header = TRUE)
 
 ## Construct the igraph object from the CSV file
