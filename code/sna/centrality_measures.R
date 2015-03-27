@@ -1,4 +1,5 @@
 ## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+
 ## This script demonstrates how to use the R package igraph to get basic centrality
 ## measures from a network (represented as an igraph object). It also saves the network
 ## in a format readable by gephi (http://gephi.github.io/) for visualization purposes.

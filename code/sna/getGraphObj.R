@@ -1,5 +1,6 @@
 ## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
-## This function constructs and returns an igraph object from the input data frame
+
+## This function constructs and returns an igraph object from the input data frame.
 
 getGraphObj <- function(weightedEdges) {
   require(igraph)

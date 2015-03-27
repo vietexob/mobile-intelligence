@@ -1,4 +1,5 @@
 ## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+
 ## This script demonstrates basic the analysis of network structure: degree distributions.
 ## It first constructs an igraph object from the input CSV file. It then fits the power
 ## law to 3 kinds of degree distribution: all degree, indegree and outdegree for the 
