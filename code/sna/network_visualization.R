@@ -1,3 +1,12 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+## This script demonstrates network community detection using igraph. It also shows how
+## to visualize the network and its discovered communities with different colors (one for
+## each community). Nodes in the network are scaled according to their outdegree and colored
+## by their community. Edges in the network are colored according to a defined threshold:
+## If an edge weight (the number of communications between two nodes) is large than
+## the threshold, color it bright orange, otherwise gray. The visualized network is finally
+## saved to disk as a PDF file for further use.
+
 rm(list = ls())
 
 library(igraph)

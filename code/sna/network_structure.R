@@ -1,3 +1,13 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+## This script demonstrates basic the analysis of network structure: degree distributions.
+## It first constructs an igraph object from the input CSV file. It then fits the power
+## law to 3 kinds of degree distribution: all degree, indegree and outdegree for the 
+## constructed directed network. Power law is fitted using the helper function 'plfit'.
+## For each distribution, an alpha exponent is computed together with the Kolmogorov–Smirnov 
+## (KS) test for significance of alpha. If alpha < 0.05, we say that it is significant
+## according to the test. Finally, plots of the power-law fits are produced: histogram and
+## cumulative distribution plots on log-log scale with the fitted straight lines.
+
 rm(list = ls()) # clear the workspace
 
 library(igraph)

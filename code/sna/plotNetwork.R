@@ -1,3 +1,6 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+## This function 
+
 plotNetwork <- function(g, mainStr="Untitled Graph", filename="", edgeWeight.theta=0,
                         width=10, height=10) {
   require(igraph)

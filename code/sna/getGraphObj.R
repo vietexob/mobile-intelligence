@@ -1,5 +1,7 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+## This function constructs and returns an igraph object from the input data frame
+
 getGraphObj <- function(weightedEdges) {
-  # Construct & returns the igraph object from the weightedEdges data frame
   require(igraph)
   
   freq <- weightedEdges$freq
@@ -11,7 +13,7 @@ getGraphObj <- function(weightedEdges) {
   
   weightedEdges.matrix <- as.matrix(weightedEdges[, -3]) # remove the 'freq' column
   g <- graph.edgelist(weightedEdges.matrix, directed = TRUE)
-  E(g)$weight <- freq # add weights to the edges
+  E(g)$weight <- freq # add weights back to the edges
   
   return(g)
 }
