@@ -1,7 +1,7 @@
 # Author: Jeff Hemsley jhemsley at uw dot edu
 # Created: Nov 20 2012
 
-# Generating random graph with random dates and creates set of pngs for animation
+# Generating random graph with random dates and creates set of PNGs for animation
 library(igraph)
 
 # igraph has many nifty ways to generate random graphs

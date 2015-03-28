@@ -1,3 +1,9 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+
+## This script demonstrates how to use the R package igraph to get basic centrality
+## measures from a network (represented as an igraph object). It also saves the network
+## in a format readable by gephi (http://gephi.github.io/) for visualization purposes.
+
 rm(list = ls()) # clear the workspace
 
 library(igraph)
@@ -17,7 +23,7 @@ weightedEdges <- read.csv(file = "./data/sna/weighted_edges.csv", header = TRUE)
 ## Centrality measures for the nodes (users)
 top <- 20 # display the top users only
 
-## Find directed betweenness centrality for each node
+## Directed betweenness centrality for each node
 btw <- betweenness(g, directed = TRUE)
 sorted.btw <- sort(btw, decreasing = TRUE)
 for(i in 1:top) {

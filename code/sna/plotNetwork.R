@@ -1,3 +1,8 @@
+## Author: Truc Viet 'Joe' Le at tjle@andrew.cmu.edu
+
+## This function plots the input igraph object 'g' and saves it as a PDF file (if
+## a non-empty filename is given).
+
 plotNetwork <- function(g, mainStr="Untitled Graph", filename="", edgeWeight.theta=0,
                         width=10, height=10) {
   require(igraph)
@@ -15,7 +20,7 @@ plotNetwork <- function(g, mainStr="Untitled Graph", filename="", edgeWeight.the
   E(g)$width <- E(g)$weight / weight.factor
   E(g)$arrow.width <- E(g)$width / 2
   
-  # Plot & save the network
+  ## Plot and save the network
   if(nchar(filename) > 0) {
     pdf(file = filename, width=width, height=height)
   }
