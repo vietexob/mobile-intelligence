@@ -70,11 +70,13 @@ for(i in 1:length(cell.loc)) {
 }
 ## How much percent is matched?
 (round(counter / length(cell.loc) * 100, 2))
+## Save the mapping to disk for future use
+save(cell_id.coord.rowIndex, file="./data/mobile/cell_id_rowIndex_mapping.RData")
 
 ## Specify a map with center at the center of all the coordinates
 cell.loc.map <- get_map(location = c(lon = mean(cell.loc.data$longitude),
                                      lat = mean(cell.loc.data$latitude)),
-                        zoom = 10, scale = 2)
+                        zoom = 11, scale = 2)
 ## Make a map that plots each cell tower
 cell.tower.pts <- geom_point(data = cell.loc.data, aes(x = longitude, y = latitude,
                                                        fill = "red", alpha = 0.80),
