@@ -3,10 +3,13 @@ rm(list = ls())
 library(rmongodb)
 library(ggplot2)
 library(ggmap)
+library(igraph)
+library(popgraph)
 library(scales)
 library(plyr)
 
 source("./code/util/fivethirtyeight_theme.R")
+source("./code/spatial/getWeightedEdges.R")
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
@@ -33,6 +36,7 @@ collection <- "cellular"
 namespace <- paste(db, collection, sep=".")
 
 ## Use the aggregation framework to find the distribution of all IMEI's
+## First group the IMEI's by frequency
 pipe_1 <- mongo.bson.from.JSON(
   '{"$group":
     {"_id": "$imei", "count": {"$sum": 1}}
@@ -70,8 +74,8 @@ ggsave(file="./figures/mobile/call_freq.png", width=4, height=3)
 ## Sort the data frame by frequency in decreasing order
 dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## Select the top IMEI's by frequency
-top <- 200
-top.imei <- as.character(dimei.distr$imei[1:100])
+top <- 300
+top.imei <- as.character(dimei.distr$imei[1:top])
 
 ## Retrieve all call records from the top IMEI's
 ## Define a master data frame to store all the results
@@ -109,7 +113,6 @@ for(i in 1:length(top.imei)) {
     ## Bind to the master data frame
     call.data <- rbind.fill(call.data, call.df)
   }
-  
   progress.bar$step()
 }
 
@@ -197,8 +200,24 @@ location.map <- ggmap(location.map, extent = 'device', legend = 'none')
 location.map <- location.map + geom_point(data = aggregate.location,
                                           aes(x = longitude, y = latitude, size = freq),
                                           fill="red", alpha=0.80, shape=21)
-location.map <- location.map + facet_wrap(~date) + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+location.map <- location.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+location.map <- location.map + facet_wrap(~date)
 print(location.map)
 
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/my_call_data_bubbles.png", width=11, height=11)
+
+#################################################################################
+weightedEdges <- getWeightedEdges(my.call.data)
+## Reduce to only the locations that can be plotted
+badIndices <- vector()
+for(i in 1:nrow(weightedEdges)) {
+  caller_loc <- toString(weightedEdges$caller_location[i])
+  caller_rowIndex <- cell_id.coord.rowIndex[[caller_loc]]
+  callee_loc <- toString(weightedEdges$callee_location[i])
+  callee_rowIndex <- cell_id.coord.rowIndex[[callee_loc]]
+  if(is.null(caller_rowIndex) || is.null(callee_rowIndex)) {
+    badIndices <- c(badIndices, i)
+  }
+}
+weightedEdges <- weightedEdges[-badIndices, ]
