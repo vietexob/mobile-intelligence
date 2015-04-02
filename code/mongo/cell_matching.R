@@ -90,3 +90,7 @@ cell.loc.map <- cell.loc.map + geom_density2d(data = cell.loc.data,
                                               aes(x = longitude, y = latitude))
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/cell_towers.pdf", width=10, height=10)
+
+## Close the connection
+mongo.disconnect(mongo)
+mongo.destroy(mongo)

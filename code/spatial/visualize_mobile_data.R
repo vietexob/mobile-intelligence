@@ -11,6 +11,11 @@ source("./code/util/fivethirtyeight_theme.R")
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
 cell.names <- cell.towers$Cell
+## Load the cell_id rowIndex mapping
+load("./data/mobile/cell_id_rowIndex_mapping.RData")
+
+## Read my call data
+# call.data <- read.csv(file="./data/mobile/my_call_data.csv")
 
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
@@ -65,7 +70,7 @@ ggsave(file="./figures/mobile/call_freq.png", width=4, height=3)
 ## Sort the data frame by frequency in decreasing order
 dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## Select the top IMEI's by frequency
-top <- 100
+top <- 200
 top.imei <- as.character(dimei.distr$imei[1:100])
 
 ## Retrieve all call records from the top IMEI's
@@ -117,5 +122,83 @@ mongo.cursor.destroy(cursor)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)
 
-## Plot the bubble charts
+## Match each cell_id with its corresponding rowIndex
+progress.bar <- create_progress_bar("text")
+progress.bar$init(nrow(call.data))
+rowIndices <- vector()
+nMatches <- 0
+for(i in 1:nrow(call.data)) {
+  cell_id <- toString(call.data$cell_id[i])
+  rowIndex <- cell_id.coord.rowIndex[[cell_id]]
+  if(is.null(rowIndex)) {
+    rowIndices <- c(rowIndices, NA)
+  } else {
+    rowIndices <- c(rowIndices, rowIndex)
+    nMatches <- nMatches + 1
+  }
+  progress.bar$step()
+}
+match.pct <- round(nMatches / nrow(call.data) * 100, 2)
+print(paste("Percent matched locations =", match.pct))
 
+## Reduce call data to those that can be plotted on a map
+my.call.data <- call.data[!is.na(rowIndices), ]
+## Further reduce to include certain date range only
+my.call.data <- subset(my.call.data, date > 20080229)
+my.call.data <- subset(my.call.data, date < 20080308)
+
+aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towers) {
+  dates <- names(table(call.data$date))
+  aggregate.data <- data.frame()
+  
+  for(i in 1:length(dates)) {
+    subset.call.data <- subset(call.data, date == dates[i])
+    cellId.table <- table(subset.call.data$cell_id)
+    cellId.table <- subset(cellId.table, cellId.table > 0)
+    cellIds <- names(cellId.table)
+    cellId.freq <- as.numeric(cellId.table)
+    
+    ## Retrieve the corresponding cell tower coordinates
+    longitude <- vector()
+    latitude <- vector()
+    for(j in 1:length(cellId.table)) {
+      rowIndex <- cell_id.coord.rowIndex[[cellIds[j]]]
+      longitude[j] <- as.numeric(cell.towers$Longitude[rowIndex])
+      latitude[j] <- as.numeric(cell.towers$Latitude[rowIndex])
+    }
+    
+    dateStr <- toString(as.Date(dates[i], "%Y%m%d"))
+    date.aggregate.data <- data.frame(cell_id = cellIds, freq = cellId.freq,
+                                      longitude = longitude, latitude = latitude,
+                                      date = rep(dateStr, length(cellId.table)))
+    aggregate.data <- rbind(aggregate.data, date.aggregate.data)
+  }
+  
+  return(aggregate.data)
+}
+
+aggregate.location <- aggregateLocationByDate(my.call.data, cell_id.coord.rowIndex,
+                                              cell.towers)
+
+## Create a spatial bubble chart
+## First, need a location at the center of all cell towers in my call data
+all.longitude <- names(table(aggregate.location$longitude))
+all.longitude <- as.numeric(all.longitude)
+mean.longitude <- mean(all.longitude)
+
+all.latitude <- names(table(aggregate.location$latitude))
+all.latitude <- as.numeric(all.latitude)
+mean.latitude <- mean(all.latitude)
+
+location <- c(mean.longitude, mean.latitude)
+theme_set(theme_bw(16))
+location.map <- get_map(location, maptype = "terrain", zoom = 11, scale=2)
+location.map <- ggmap(location.map, extent = 'device', legend = 'none')
+location.map <- location.map + geom_point(data = aggregate.location,
+                                          aes(x = longitude, y = latitude, size = freq),
+                                          fill="red", alpha=0.80, shape=21)
+location.map <- location.map + facet_wrap(~date) + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+print(location.map)
+
+## Save the plot on disk
+ggsave(filename="./figures/mobile/my_call_data_bubbles.png", width=11, height=11)
