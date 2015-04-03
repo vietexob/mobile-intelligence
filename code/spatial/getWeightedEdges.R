@@ -1,6 +1,6 @@
 getWeightedEdges <- function(call.data, lower.bound=0, upper.bound=50) {
-  ## Returns a data frame that represents the directed edges
-  ## between callers and callees
+  ## Returns a data frame that represents the weighted edges
+  ## between callers and callees in the mobile phone data.
   
   ## Select the callers that are also callees
   call_ids <- intersect(call.data$caller_id, call.data$callee_id)

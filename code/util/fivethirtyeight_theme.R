@@ -1,4 +1,5 @@
 fivethirtyeight_theme <- function() {
+  ## Theme for our plots so that it resemble those on http://fivethirtyeight.com
   library(RColorBrewer)
   library(grid)
   

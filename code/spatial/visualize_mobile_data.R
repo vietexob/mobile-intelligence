@@ -1,23 +1,37 @@
 rm(list = ls())
 
+## This tutorial explores basic spatial visualization techniques for the mobile phone
+## dataset. Specifically, we will explore two visualization techniques: spatial bubble plot
+## and population graph. Spatial bubble plot is a simple techinque to visualize the
+## distribution of "events" over space, where each "event" is any incident of interest that
+## can be described by its spatial coordinates and that happens during the specfied duration.
+## Each bubble is visually scaled by the number of events that happen nearby and are mapped
+## to its coordinates. Population graph (http://dyerlab.github.io/popgraph/) is a concept
+## introduced by Dyer and Nason (http://www.ncbi.nlm.nih.gov/pubmed/15189198) to visualize
+## both the distribution of events over space and the relationships among those events.
+## In other words, it is a graph laid over a spatial map, where each node of the graph is
+## an event and each edge represents the relationship between a pair of events. In this
+## tutorial, we will use the popgraph package to plot population graphs.
+
+## Load the required packages, assuming they have been installed
 library(rmongodb)
 library(ggplot2)
-library(ggmap)
-library(igraph)
-library(popgraph)
-library(scales)
-library(plyr)
+library(ggmap) ## for plotting maps
+library(igraph) ## for plotting graphs
+library(popgraph) ## for plotting population graphs
+library(scales) ## for plot formatting 
+library(plyr) ## for data manipulation
 
-source("./code/util/fivethirtyeight_theme.R")
-source("./code/spatial/getWeightedEdges.R")
+## Source the useful functions
+source("./code/util/fivethirtyeight_theme.R") ## fancy-looking theme for the plot
+source("./code/spatial/getWeightedEdges.R") ## create weighted call graph
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
-## Load the cell_id rowIndex mapping
-load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
-## Read my call data
-# call.data <- read.csv(file="./data/mobile/my_call_data.csv")
+## Load the cell_id rowIndex lookup table (from the previous
+## tutorial: http://vietletruc.com/wp-content/uploads/2015/03/cell_locations.html)
+load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
@@ -34,7 +48,7 @@ mongo.is.connected(mongo)
 collection <- "cellular"
 namespace <- paste(db, collection, sep=".")
 
-## Use the aggregation framework to find the distribution of all IMEI's
+## Use the aggregation framework to retrieve the distribution of all IMEI's
 ## First group the IMEI's by frequency
 pipe_1 <- mongo.bson.from.JSON(
   '{"$group":
@@ -49,7 +63,9 @@ pipe_2 <- mongo.bson.from.JSON(
 pipe_3 <- mongo.bson.from.JSON(
   '{"$match": {"count": {"$lte": 300}}}'
 )
+## Combine the pipeline and execute the aggregation
 pipeline <- list(pipe_1, pipe_2, pipe_3)
+## NOTE: This execution will take some time.
 imei.distr <- mongo.aggregation(mongo, namespace, pipeline)
 
 ## Reshape the data to fit into an R data frame
@@ -59,7 +75,7 @@ mimei.distr <- sapply(limei.distr, function(x) return(c(toString(x[["_id"]]),
 mimei.distr <- t(mimei.distr) # transpose the matrix
 call.freq <- as.numeric(mimei.distr[, 2]) # convert frequencies into numeric
 dimei.distr <- as.data.frame(mimei.distr) # convert matrix into data frame
-colnames(dimei.distr) <- c("imei", "freq")
+colnames(dimei.distr) <- c("imei", "freq") # name the columns
 dimei.distr$freq <- call.freq
 
 ## Plot the histogram of the IMEI frequencies
@@ -68,11 +84,15 @@ dimei.distr$freq <- call.freq
    labs(title="Distribution of Call Frequencies in [100, 300]",
         x="Call Frequency", y="Frequency") + scale_x_continuous(labels=comma) +
    scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
+## Save the plot to disk
 ggsave(file="./figures/mobile/call_freq.png", width=4, height=3)
 
 ## Sort the data frame by frequency in decreasing order
 dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## Select the top IMEI's by frequency
+## NOTE: The retrieval of records through IMEI (depending on many) may take a **very long**
+## time. Consider changing the 'top' variable to a smaller number if it takes too much time.
+## With this current setting, I left the laptop run overnight to retrieve all the records.
 top <- 1500
 top.imei <- as.character(dimei.distr$imei[1:top])
 
@@ -116,6 +136,8 @@ for(i in 1:length(top.imei)) {
 }
 
 ## Save the call data to disk for further use
+## NOTE: It is a good practice to save the retrieved data to offline storage in order
+## to avoid retrieving them again the next time, and save substantial time and effort
 write.csv(call.data, file="./data/mobile/my_call_data.csv", row.names=FALSE)
 
 ## Release the resources attached to cursor on both client and server
@@ -124,22 +146,25 @@ mongo.cursor.destroy(cursor)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)
 
-## Match each cell_id with its corresponding rowIndex
+## Match each cell_id with its corresponding rowIndex of the coordinate table
 progress.bar <- create_progress_bar("text")
 progress.bar$init(nrow(call.data))
-rowIndices <- vector()
-nMatches <- 0
+rowIndices <- vector() ## a vector of row indices
+nMatches <- 0 ## count the number of matches
 for(i in 1:nrow(call.data)) {
+  ## Have to convert numeric to string in order to do lookup
   cell_id <- toString(call.data$cell_id[i])
+  ## Look up the (loaded) table
   rowIndex <- cell_id.coord.rowIndex[[cell_id]]
-  if(is.null(rowIndex)) {
+  if(is.null(rowIndex)) { ## if matched
     rowIndices <- c(rowIndices, NA)
-  } else {
+  } else { ## if unmatched
     rowIndices <- c(rowIndices, rowIndex)
     nMatches <- nMatches + 1
   }
   progress.bar$step()
 }
+## Calculate the matched percentage
 match.pct <- round(nMatches / nrow(call.data) * 100, 2)
 print(paste("Percent matched locations =", match.pct))
 
@@ -150,8 +175,10 @@ my.call.data <- subset(my.call.data, date > 20080229)
 my.call.data <- subset(my.call.data, date < 20080308)
 
 aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towers) {
+  ## This function aggregates the retrieved call data by each date.
+  ## Specifically, it 
   dates <- names(table(call.data$date))
-  aggregate.data <- data.frame()
+  aggregate.data <- data.frame() # master data frame to store the records
   
   for(i in 1:length(dates)) {
     subset.call.data <- subset(call.data, date == dates[i])
