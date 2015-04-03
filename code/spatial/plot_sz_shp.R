@@ -11,12 +11,11 @@ library(rgeos)
 ## (3) Download and install 'rgeos' from CRAN: R CMD INSTALL ./rgeos_0.3-8.tar
 ## (4) http://spatial.ly/2010/11/installing-rgdal-on-mac-os-x/
 
-## 1. Read the shapefiles
+## Read the shapefiles
 ## The spatial object wouldn't have a coordinate system assigned to it.
 ## We can check it by proj4string(sz_bou). We thus need to assign a CRS
 ## (coordinate reference system) to the object before we can plot it.
 ## Here we use the WGS84 standard (the World Geodetic System proposed in 1984)
-
 sz_bou <- readShapeSpatial(fn="./data/sz_shp/sz_bou.shp",
                            proj4string = CRS("+proj=longlat + datum=WGS84"))
 sz_road <- readShapeSpatial(fn="./data/sz_shp/sz_road.shp",
@@ -31,7 +30,7 @@ sz_wat <- readShapeSpatial(fn="./data/sz_shp/sz_wat.shp",
 # sz_tow <- readShapeSpatial(fn="./data/sz_shp/sz_tow.shp",
 #                            proj4string = CRS("+proj=longlat + datum=WGS84"))
 
-## This is a quirky walkaround solution
+## This is a quirky walkaround
 sz_tow <- readOGR(dsn="./data/sz_shp/", layer="sz_tow")
 ## Assign WGS84 coordinate system to the object
 proj4string(sz_tow) <- CRS("+init=epsg:4326")
@@ -71,7 +70,7 @@ shenzhen <- shenzhen + geom_polygon(data=sz_road.data,
 shenzhen <- shenzhen + geom_point(data=sz_tow.data,
                                   aes(x=coords.x1, y=coords.x2, group=NULL), color="red",
                                   fill="red", alpha=0.8, size=2, shape=20)
-# print(shenzhen, scale=3, dpi=400)
+print(shenzhen, scale=3, dpi=400)
 
 ## Save the plot as a file on disk
 ggsave(filename="./figures/sz_shp/sz_shp_ggplot.pdf", scale = 3, dpi = 400)

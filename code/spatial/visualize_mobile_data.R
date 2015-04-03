@@ -13,7 +13,6 @@ source("./code/spatial/getWeightedEdges.R")
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
-cell.names <- cell.towers$Cell
 ## Load the cell_id rowIndex mapping
 load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
@@ -74,7 +73,7 @@ ggsave(file="./figures/mobile/call_freq.png", width=4, height=3)
 ## Sort the data frame by frequency in decreasing order
 dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## Select the top IMEI's by frequency
-top <- 300
+top <- 1500
 top.imei <- as.character(dimei.distr$imei[1:top])
 
 ## Retrieve all call records from the top IMEI's
@@ -207,7 +206,8 @@ print(location.map)
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/my_call_data_bubbles.png", width=11, height=11)
 
-#################################################################################
+############################# EXPERIMENTAL PART #############################
+
 weightedEdges <- getWeightedEdges(my.call.data)
 ## Reduce to only the locations that can be plotted
 badIndices <- vector()
@@ -221,3 +221,41 @@ for(i in 1:nrow(weightedEdges)) {
   }
 }
 weightedEdges <- weightedEdges[-badIndices, ]
+
+## Convert into cell location compatible with the spreadsheet
+caller_cell_loc <- vector()
+callee_cell_loc <- vector()
+for(i in 1:nrow(weightedEdges)) {
+  caller_loc_str <- toString(weightedEdges$caller_location[i])
+  rowIndex <- cell_id.coord.rowIndex[[caller_loc_str]]
+  caller_cell_loc[i] <- cell.towers$Cell[rowIndex]
+  
+  callee_loc_str <- toString(weightedEdges$callee_location[i])
+  rowIndex <- cell_id.coord.rowIndex[[callee_loc_str]]
+  callee_cell_loc[i] <- cell.towers$Cell[rowIndex]
+}
+## Merge with the weighted edges
+weightedEdges$caller_cell_loc <- caller_cell_loc
+weightedEdges$callee_cell_loc <- callee_cell_loc
+
+## Create an igraph object from the weighted edges
+weightedEdges.matrix <- as.matrix(weightedEdges[, 6:7])
+g <- graph.edgelist(weightedEdges.matrix)
+E(g)$weight <- weightedEdges$Freq # add weights to the edges
+
+## Configure the graph for visualization
+V(g)$size <- degree(g, mode = "all")
+g <- decorate_graph(g, cell.towers, stratum = "Cell")
+
+g.map <- get_map(location, maptype = "terrain", zoom = 11, scale=2)
+g.map <- ggmap(g.map, extent = 'device', legend = 'none')
+g.map <- g.map + geom_nodeset(aes(x = Longitude, y = Latitude, size=size),
+                              graph=g, color="red")
+g.map <- g.map + geom_edgeset(aes(x = Longitude, y = Latitude, size=weight),
+                              graph=g, color="blue")
+g.map <- g.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+print(g.map)
+
+## Save the plot on disk
+ggsave(filename="./figures/mobile/my_call_graph.png", width=10, height=10)
+
