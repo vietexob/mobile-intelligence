@@ -35,6 +35,9 @@ cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 ## tutorial: http://vietletruc.com/wp-content/uploads/2015/03/cell_locations.html)
 load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
+## Load the previously retrieved call data
+call.data <- read.csv(file="./data/mobile/my_call_data.csv")
+
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
 username <- "student"
@@ -165,6 +168,8 @@ for(i in 1:nrow(call.data)) {
       rowIndices <- c(rowIndices, rowIndex)
       nMatches <- nMatches + 1
     }
+  } else {
+    rowIndices <- c(rowIndices, NA)
   }
   
   progress.bar$step()
@@ -197,7 +202,6 @@ aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towe
     longitude <- vector()
     latitude <- vector()
     counter <- 0
-    badIndices <- vector()
     for(j in 1:length(cellId.table)) {
       if(nchar(cellIds[j]) > 0) {
         rowIndex <- cell_id.coord.rowIndex[[cellIds[j]]]
@@ -215,19 +219,14 @@ aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towe
           latitude[j] <- as.numeric(aLatitude)
           counter <- counter + 1
         } else {
-          badIndices <- c(badIndices, j)
+          stop(paste("Unmatched cell_id:", cellIds[j]))
         }
       } else {
-        badIndices <- c(badIndices, j)
+        stop(paste("Zero-length cell_id:", j))
       }
     }
     
     dateStr <- toString(as.Date(dates[i], "%Y%m%d"))
-    ## Remove the bad rows
-    cellIds <- cellIds[-badIndices]
-    cellId.freq <- cellId.freq[-badIndices]
-    longitude <- longitude[!is.na(longitude)]
-    latitude <- latitude[!is.na(latitude)]
     date.aggregate.data <- data.frame(cell_id = cellIds, freq = cellId.freq,
                                       longitude = longitude, latitude = latitude,
                                       date = rep(dateStr, counter))
@@ -252,17 +251,19 @@ mean.latitude <- mean(all.latitude)
 
 location <- c(mean.longitude, mean.latitude)
 theme_set(theme_bw(16))
-location.map <- get_map(location, maptype = "terrain", zoom = 11, scale=2)
+location.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 location.map <- ggmap(location.map, extent = 'device', legend = 'none')
 location.map <- location.map + geom_point(data = aggregate.location,
                                           aes(x = longitude, y = latitude, size = freq),
                                           fill="red", alpha=0.80, shape=21)
 location.map <- location.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+location.map <- location.map + ggtitle("Distribution of Call Events over the Week")
+location.map <- location.map + fivethirtyeight_theme()
 location.map <- location.map + facet_wrap(~date)
 print(location.map)
 
 ## Save the plot on disk
-ggsave(filename="./figures/mobile/my_call_data_bubbles.png", width=11, height=11)
+ggsave(filename="./figures/mobile/my_call_bubbles.png", width=10, height=10)
 
 ##### POP GRAPH #####
 weightedEdges <- getWeightedEdges(my.call.data)
@@ -277,7 +278,9 @@ for(i in 1:nrow(weightedEdges)) {
     badIndices <- c(badIndices, i)
   }
 }
-weightedEdges <- weightedEdges[-badIndices, ]
+if(length(badIndices) > 0) {
+  weightedEdges <- weightedEdges[-badIndices, ]
+}
 
 ## Convert into cell location compatible with the spreadsheet
 caller_cell_loc <- vector()
@@ -304,15 +307,18 @@ E(g)$weight <- weightedEdges$Freq # add weights to the edges
 V(g)$size <- degree(g, mode = "all")
 g <- decorate_graph(g, cell.towers, stratum = "Cell")
 
-g.map <- get_map(location, maptype = "terrain", zoom = 11, scale=2)
+g.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 g.map <- ggmap(g.map, extent = 'device', legend = 'none')
 g.map <- g.map + geom_nodeset(aes(x = Longitude, y = Latitude, size=size),
                               graph=g, color="red")
 g.map <- g.map + geom_edgeset(aes(x = Longitude, y = Latitude, size=weight),
                               graph=g, color="blue")
+g.map <- g.map + ggtitle("Spatial Call Graph for One-week Duration")
+g.map <- g.map + fivethirtyeight_theme()
 g.map <- g.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+
 print(g.map)
 
 ## Save the plot on disk
-ggsave(filename="./figures/mobile/my_call_graph.png", width=10, height=10)
+ggsave(filename="./figures/mobile/my_call_graph.png", width=8, height=8)
 

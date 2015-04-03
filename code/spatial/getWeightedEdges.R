@@ -16,8 +16,8 @@ getWeightedEdges <- function(call.data, lower.bound=0, upper.bound=50) {
       ## Find the most frequented location
       cell_id.table <- table(subset.caller_id$cell_id)
       most.freq.cell_id <- names(sort(cell_id.table, decreasing=TRUE))[1]
-      print(most.freq.cell_id)
-      caller_id.cell_id[[a_call_id]] <- most.freq.cell_id
+      print(paste(a_call_id, most.freq.cell_id))
+      caller_id.cell_id[[toString(a_call_id)]] <- most.freq.cell_id
     }
   }
   
