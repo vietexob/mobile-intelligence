@@ -28,6 +28,8 @@ source("./code/spatial/getWeightedEdges.R") ## create weighted call graph
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
+cell.towers$Longitude <- as.numeric(cell.towers$Longitude)
+cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 
 ## Load the cell_id rowIndex lookup table (from the previous
 ## tutorial: http://vietletruc.com/wp-content/uploads/2015/03/cell_locations.html)
@@ -154,14 +156,17 @@ nMatches <- 0 ## count the number of matches
 for(i in 1:nrow(call.data)) {
   ## Have to convert numeric to string in order to do lookup
   cell_id <- toString(call.data$cell_id[i])
-  ## Look up the (loaded) table
-  rowIndex <- cell_id.coord.rowIndex[[cell_id]]
-  if(is.null(rowIndex)) { ## if matched
-    rowIndices <- c(rowIndices, NA)
-  } else { ## if unmatched
-    rowIndices <- c(rowIndices, rowIndex)
-    nMatches <- nMatches + 1
+  if(nchar(cell_id) > 0) {
+    ## Look up the (loaded) table
+    rowIndex <- cell_id.coord.rowIndex[[cell_id]]
+    if(is.null(rowIndex)) { ## if matched
+      rowIndices <- c(rowIndices, NA)
+    } else { ## if unmatched
+      rowIndices <- c(rowIndices, rowIndex)
+      nMatches <- nMatches + 1
+    }
   }
+  
   progress.bar$step()
 }
 ## Calculate the matched percentage
@@ -170,7 +175,8 @@ print(paste("Percent matched locations =", match.pct))
 
 ## Reduce call data to those that can be plotted on a map
 my.call.data <- call.data[!is.na(rowIndices), ]
-## Further reduce to include certain date range only
+## Further reduce to include a certain date range only. Why?
+(table(my.call.data$date))
 my.call.data <- subset(my.call.data, date > 20080229)
 my.call.data <- subset(my.call.data, date < 20080308)
 
@@ -190,16 +196,41 @@ aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towe
     ## Retrieve the corresponding cell tower coordinates
     longitude <- vector()
     latitude <- vector()
+    counter <- 0
+    badIndices <- vector()
     for(j in 1:length(cellId.table)) {
-      rowIndex <- cell_id.coord.rowIndex[[cellIds[j]]]
-      longitude[j] <- as.numeric(cell.towers$Longitude[rowIndex])
-      latitude[j] <- as.numeric(cell.towers$Latitude[rowIndex])
+      if(nchar(cellIds[j]) > 0) {
+        rowIndex <- cell_id.coord.rowIndex[[cellIds[j]]]
+        if(!is.null(rowIndex)) {
+          aLongitude <- cell.towers$Longitude[rowIndex]
+          if(!is.numeric(aLongitude)) {
+            aLongitude <- as.numeric(aLongitude)
+          }
+          aLatitude <- cell.towers$Latitude[rowIndex]
+          if(!is.numeric(aLatitude)) {
+            aLatitude <- as.numeric(aLatitude)
+          }
+          
+          longitude[j] <- as.numeric(aLongitude)
+          latitude[j] <- as.numeric(aLatitude)
+          counter <- counter + 1
+        } else {
+          badIndices <- c(badIndices, j)
+        }
+      } else {
+        badIndices <- c(badIndices, j)
+      }
     }
     
     dateStr <- toString(as.Date(dates[i], "%Y%m%d"))
+    ## Remove the bad rows
+    cellIds <- cellIds[-badIndices]
+    cellId.freq <- cellId.freq[-badIndices]
+    longitude <- longitude[!is.na(longitude)]
+    latitude <- latitude[!is.na(latitude)]
     date.aggregate.data <- data.frame(cell_id = cellIds, freq = cellId.freq,
                                       longitude = longitude, latitude = latitude,
-                                      date = rep(dateStr, length(cellId.table)))
+                                      date = rep(dateStr, counter))
     aggregate.data <- rbind(aggregate.data, date.aggregate.data)
   }
   
@@ -233,8 +264,7 @@ print(location.map)
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/my_call_data_bubbles.png", width=11, height=11)
 
-############################# EXPERIMENTAL PART #############################
-
+##### POP GRAPH #####
 weightedEdges <- getWeightedEdges(my.call.data)
 ## Reduce to only the locations that can be plotted
 badIndices <- vector()
