@@ -11,23 +11,28 @@ rm(list = ls())
 ## both the distribution of events over space and the relationships among those events.
 ## In other words, it is a graph laid over a spatial map, where each node of the graph is
 ## an event and each edge represents the relationship between a pair of events. In this
-## tutorial, we will use the 'popgraph' package to plot population graphs.
+## tutorial, we will use the 'popgraph' package to plot population graphs. The 'events'
+## here are the phone calls mapped to the nearest cell tower. Thus, each node in the graph
+## corresponds to a cell tower, and the edges between them are the social relationships
+## between those people that called each other.
 
 ## Load the required packages, assuming they have been installed
 library(rmongodb)
 library(ggplot2)
-library(ggmap) ## for plotting maps
-library(igraph) ## for plotting graphs
-library(popgraph) ## for plotting population graphs
-library(scales) ## for plot formatting 
-library(plyr) ## for data manipulation
+library(ggmap) # for plotting maps
+library(igraph) # for plotting graphs
+library(popgraph) # for plotting population graphs
+library(scales) # for plot formatting 
+library(plyr) # for data manipulation
 
 ## Source the useful functions
-source("./code/util/fivethirtyeight_theme.R") ## fancy-looking theme for the plot
-source("./code/spatial/getWeightedEdges.R") ## create weighted call graph
+source("./code/util/fivethirtyeight_theme.R") # fancy-looking theme for the plot
+source("./code/spatial/getWeightedEdges.R") # create weighted call graph
+source("./code/spatial/aggregateLocationByDate.R") # for call data aggregation by date
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
+## Convert from string to numeric format
 cell.towers$Longitude <- as.numeric(cell.towers$Longitude)
 cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 
@@ -36,6 +41,10 @@ cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
 ## Load the previously retrieved call data
+## NB: This is the call data frame retrieved from the lines below (66-154).
+## Because it has taken a significant retrieval time, I saved it as an offline file
+## and load it whenever I want to use it. If you want to use this data frame, skip lines
+## 66 to 154 to save time. Feel free to experiment with other params and get a diff dataset.
 call.data <- read.csv(file="./data/mobile/my_call_data.csv")
 
 ## Login credentials
@@ -98,7 +107,7 @@ dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## NOTE: The retrieval of records through IMEI (depending on many) may take a **very long**
 ## time. Consider changing the 'top' variable to a smaller number if it takes too much time.
 ## With this current setting, I left the laptop run overnight to retrieve all the records.
-top <- 1500
+top <- 1000
 top.imei <- as.character(dimei.distr$imei[1:top])
 
 ## Retrieve all call records from the top IMEI's
@@ -154,17 +163,17 @@ mongo.destroy(mongo)
 ## Match each cell_id with its corresponding rowIndex of the coordinate table
 progress.bar <- create_progress_bar("text")
 progress.bar$init(nrow(call.data))
-rowIndices <- vector() ## a vector of row indices
-nMatches <- 0 ## count the number of matches
+rowIndices <- vector() # a vector of row indices
+nMatches <- 0 # count the number of matches
 for(i in 1:nrow(call.data)) {
   ## Have to convert numeric to string in order to do lookup
   cell_id <- toString(call.data$cell_id[i])
   if(nchar(cell_id) > 0) {
     ## Look up the (loaded) table
     rowIndex <- cell_id.coord.rowIndex[[cell_id]]
-    if(is.null(rowIndex)) { ## if matched
+    if(is.null(rowIndex)) { # if matched
       rowIndices <- c(rowIndices, NA)
-    } else { ## if unmatched
+    } else { # if unmatched
       rowIndices <- c(rowIndices, rowIndex)
       nMatches <- nMatches + 1
     }
@@ -185,87 +194,50 @@ my.call.data <- call.data[!is.na(rowIndices), ]
 my.call.data <- subset(my.call.data, date > 20080229)
 my.call.data <- subset(my.call.data, date < 20080308)
 
-aggregateLocationByDate <- function(call.data, cell_id.coord.rowIndex, cell.towers) {
-  ## This function aggregates the retrieved call data by each date.
-  ## Specifically, it 
-  dates <- names(table(call.data$date))
-  aggregate.data <- data.frame() # master data frame to store the records
-  
-  for(i in 1:length(dates)) {
-    subset.call.data <- subset(call.data, date == dates[i])
-    cellId.table <- table(subset.call.data$cell_id)
-    cellId.table <- subset(cellId.table, cellId.table > 0)
-    cellIds <- names(cellId.table)
-    cellId.freq <- as.numeric(cellId.table)
-    
-    ## Retrieve the corresponding cell tower coordinates
-    longitude <- vector()
-    latitude <- vector()
-    counter <- 0
-    for(j in 1:length(cellId.table)) {
-      if(nchar(cellIds[j]) > 0) {
-        rowIndex <- cell_id.coord.rowIndex[[cellIds[j]]]
-        if(!is.null(rowIndex)) {
-          aLongitude <- cell.towers$Longitude[rowIndex]
-          if(!is.numeric(aLongitude)) {
-            aLongitude <- as.numeric(aLongitude)
-          }
-          aLatitude <- cell.towers$Latitude[rowIndex]
-          if(!is.numeric(aLatitude)) {
-            aLatitude <- as.numeric(aLatitude)
-          }
-          
-          longitude[j] <- as.numeric(aLongitude)
-          latitude[j] <- as.numeric(aLatitude)
-          counter <- counter + 1
-        } else {
-          stop(paste("Unmatched cell_id:", cellIds[j]))
-        }
-      } else {
-        stop(paste("Zero-length cell_id:", j))
-      }
-    }
-    
-    dateStr <- toString(as.Date(dates[i], "%Y%m%d"))
-    date.aggregate.data <- data.frame(cell_id = cellIds, freq = cellId.freq,
-                                      longitude = longitude, latitude = latitude,
-                                      date = rep(dateStr, counter))
-    aggregate.data <- rbind(aggregate.data, date.aggregate.data)
-  }
-  
-  return(aggregate.data)
-}
-
-aggregate.location <- aggregateLocationByDate(my.call.data, cell_id.coord.rowIndex,
-                                              cell.towers)
+## Aggregate all the call records by date and find the locations of the cell towers
+## and the frequency of the calls made from each.
+aggregate.location <- aggregateLocationByDate(my.call.data,
+                                              cell_id.coord.rowIndex, cell.towers)
 
 ## Create a spatial bubble chart
 ## First, need a location at the center of all cell towers in my call data
+## Calculate the mean longitude
 all.longitude <- names(table(aggregate.location$longitude))
 all.longitude <- as.numeric(all.longitude)
 mean.longitude <- mean(all.longitude)
 
+## Calculate the mean latitude
 all.latitude <- names(table(aggregate.location$latitude))
 all.latitude <- as.numeric(all.latitude)
 mean.latitude <- mean(all.latitude)
 
+## Retrieved a map centered at the given location
 location <- c(mean.longitude, mean.latitude)
-theme_set(theme_bw(16))
 location.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 location.map <- ggmap(location.map, extent = 'device', legend = 'none')
+## Add the "bubbles" to the map, and size them by frequency.
+## Here we choose shape 21 (circle) and fill it red. For a full list of shapes,
+## see http://sape.inf.usi.ch/quick-reference/ggplot2/shape
 location.map <- location.map + geom_point(data = aggregate.location,
                                           aes(x = longitude, y = latitude, size = freq),
                                           fill="red", alpha=0.80, shape=21)
+## Remove any legends from the plot
 location.map <- location.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+## Add a title to the plot
 location.map <- location.map + ggtitle("Distribution of Call Events over the Week")
+## Add a fancy theme to it (this step is optional)
 location.map <- location.map + fivethirtyeight_theme()
+## Split the plot into tiles (or facets), one for each date
 location.map <- location.map + facet_wrap(~date)
+## Display the plot (or else it won't show)
 print(location.map)
 
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/my_call_bubbles.png", width=10, height=10)
 
-##### POP GRAPH #####
+## Here, we plot the population graph for all the calls made during the week.
+## First, construct a data frame that represents the weighted relationships between nodes.
+## Each node is a caller and/or callee, whose location is mapped to a cell_id.
 weightedEdges <- getWeightedEdges(my.call.data)
 ## Reduce to only the locations that can be plotted
 badIndices <- vector()

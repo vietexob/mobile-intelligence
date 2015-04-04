@@ -4,7 +4,7 @@ getWeightedEdges <- function(call.data, lower.bound=0, upper.bound=50) {
   
   ## Select the callers that are also callees
   call_ids <- intersect(call.data$caller_id, call.data$callee_id)
-  ## TODO: Have to reconsider this criteria
+  ## TODO: Should reconsider this criteria to reduce data loss
   subset.call.data <- subset(call.data, caller_id %in% call_ids)
   subset.call.data <- subset(subset.call.data, callee_id %in% call_ids)
   
