@@ -4,14 +4,14 @@ rm(list = ls())
 ## dataset. Specifically, we will explore two visualization techniques: spatial bubble plot
 ## and population graph. Spatial bubble plot is a simple techinque to visualize the
 ## distribution of "events" over space, where each "event" is any incident of interest that
-## can be described by its spatial coordinates and that happens during the specfied duration.
+## can be described by its spatial coordinates and that happens during a specfied duration.
 ## Each bubble is visually scaled by the number of events that happen nearby and are mapped
 ## to its coordinates. Population graph (http://dyerlab.github.io/popgraph/) is a concept
 ## introduced by Dyer and Nason (http://www.ncbi.nlm.nih.gov/pubmed/15189198) to visualize
 ## both the distribution of events over space and the relationships among those events.
 ## In other words, it is a graph laid over a spatial map, where each node of the graph is
 ## an event and each edge represents the relationship between a pair of events. In this
-## tutorial, we will use the popgraph package to plot population graphs.
+## tutorial, we will use the 'popgraph' package to plot population graphs.
 
 ## Load the required packages, assuming they have been installed
 library(rmongodb)
