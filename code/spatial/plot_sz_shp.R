@@ -9,7 +9,7 @@ library(rgeos)
 ## (1) Install Homebrew: http://brew.sh
 ## (2) Install 'geos': brew install geos
 ## (3) Download and install 'rgeos' from CRAN: R CMD INSTALL ./rgeos_0.3-8.tar
-## (4) http://spatial.ly/2010/11/installing-rgdal-on-mac-os-x/
+## (4) Follow: http://spatial.ly/2010/11/installing-rgdal-on-mac-os-x/
 
 ## Read the shapefiles
 ## The spatial object wouldn't have a coordinate system assigned to it.

@@ -41,10 +41,10 @@ cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
 ## Load the previously retrieved call data
-## NB: This is the call data frame retrieved from the lines below (66-154).
+## NB: This is the call data frame retrieved from the lines below (67-155).
 ## Because it has taken a significant retrieval time, I saved it as an offline file
 ## and load it whenever I want to use it. If you want to use this data frame, skip lines
-## 66 to 154 to save time. Feel free to experiment with other params and get a diff dataset.
+## 67 to 155 to save time. Feel free to experiment with other params and get a diff dataset.
 call.data <- read.csv(file="./data/mobile/my_call_data.csv")
 
 ## Login credentials
@@ -98,6 +98,7 @@ dimei.distr$freq <- call.freq
    labs(title="Distribution of Call Frequencies in [100, 300]",
         x="Call Frequency", y="Frequency") + scale_x_continuous(labels=comma) +
    scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
+
 ## Save the plot to disk
 ggsave(file="./figures/mobile/call_freq.png", width=4, height=3)
 
@@ -235,7 +236,7 @@ print(location.map)
 ## Save the plot on disk
 ggsave(filename="./figures/mobile/my_call_bubbles.png", width=10, height=10)
 
-## Here, we plot the population graph for all the calls made during the week.
+## Here, we plot the population graph for all the calls made during the whole week.
 ## First, construct a data frame that represents the weighted relationships between nodes.
 ## Each node is a caller and/or callee, whose location is mapped to a cell_id.
 weightedEdges <- getWeightedEdges(my.call.data)
@@ -250,11 +251,11 @@ for(i in 1:nrow(weightedEdges)) {
     badIndices <- c(badIndices, i)
   }
 }
-if(length(badIndices) > 0) {
+if(length(badIndices) > 0) { # remove the bad rows, if any
   weightedEdges <- weightedEdges[-badIndices, ]
 }
 
-## Convert into cell location compatible with the spreadsheet
+## Convert into cell location names compatible with the spreadsheet
 caller_cell_loc <- vector()
 callee_cell_loc <- vector()
 for(i in 1:nrow(weightedEdges)) {
@@ -270,7 +271,9 @@ for(i in 1:nrow(weightedEdges)) {
 weightedEdges$caller_cell_loc <- caller_cell_loc
 weightedEdges$callee_cell_loc <- callee_cell_loc
 
-## Create an igraph object from the weighted edges
+## Create an igraph object from the weighted edges -- from the last 2 columns only
+## (because those are the plottable locations that are compatible with the spreadsheet
+## "Cell" column.)
 weightedEdges.matrix <- as.matrix(weightedEdges[, 6:7])
 g <- graph.edgelist(weightedEdges.matrix)
 E(g)$weight <- weightedEdges$Freq # add weights to the edges
@@ -278,19 +281,23 @@ E(g)$weight <- weightedEdges$Freq # add weights to the edges
 ## Configure the graph for visualization
 V(g)$size <- degree(g, mode = "all")
 g <- decorate_graph(g, cell.towers, stratum = "Cell")
-
+## Retrieve the map from Google Maps
 g.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 g.map <- ggmap(g.map, extent = 'device', legend = 'none')
+## Add nodes to the map, where each code is described by a pair of coordinates
+## and scaled by its size (i.e., call frequency)
 g.map <- g.map + geom_nodeset(aes(x = Longitude, y = Latitude, size=size),
                               graph=g, color="red")
+## Add edges to the map, where each edge is also scaled by pairwise frequency
 g.map <- g.map + geom_edgeset(aes(x = Longitude, y = Latitude, size=weight),
                               graph=g, color="blue")
+## Add title and theme (optional)
 g.map <- g.map + ggtitle("Spatial Call Graph for One-week Duration")
 g.map <- g.map + fivethirtyeight_theme()
+## Disable any legend
 g.map <- g.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
-
+## Display the map
 print(g.map)
 
-## Save the plot on disk
+## Save the plot to disk
 ggsave(filename="./figures/mobile/my_call_graph.png", width=8, height=8)
-
