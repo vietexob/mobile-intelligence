@@ -45,7 +45,7 @@ load("./data/mobile/cell_id_rowIndex_mapping.RData")
 ## Because it has taken a significant retrieval time, I saved it as an offline file
 ## and load it whenever I want to use it. If you want to use this data frame, skip lines
 ## 67 to 155 to save time. Feel free to experiment with other params and get a diff dataset.
-call.data <- read.csv(file="./data/mobile/my_call_data.csv")
+# call.data <- read.csv(file="./data/mobile/my_call_data.csv")
 
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
@@ -69,13 +69,13 @@ pipe_1 <- mongo.bson.from.JSON(
     {"_id": "$imei", "count": {"$sum": 1}}
   }'
 )
-## Get those whose call frequencies are at least 100
+## Get those whose call frequencies are at least X
 pipe_2 <- mongo.bson.from.JSON(
-  '{"$match": {"count": {"$gte": 100}}}'
+  '{"$match": {"count": {"$gte": 90}}}'
 )
-## And those whose call frequencies are no more than 300
+## And those whose call frequencies are no more than Y
 pipe_3 <- mongo.bson.from.JSON(
-  '{"$match": {"count": {"$lte": 300}}}'
+  '{"$match": {"count": {"$lte": 100}}}'
 )
 ## Combine the pipeline and execute the aggregation
 pipeline <- list(pipe_1, pipe_2, pipe_3)
@@ -95,7 +95,7 @@ dimei.distr$freq <- call.freq
 ## Plot the histogram of the IMEI frequencies
 (ggplot(dimei.distr, aes(freq)) + geom_histogram(binwidth=2, fill="#c0392b", alpha=0.75) +
    fivethirtyeight_theme() + 
-   labs(title="Distribution of Call Frequencies in [100, 300]",
+   labs(title="Distribution of Call Frequencies in [90, 100]",
         x="Call Frequency", y="Frequency") + scale_x_continuous(labels=comma) +
    scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
 
@@ -108,7 +108,7 @@ dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## NOTE: The retrieval of records through IMEI (depending on many) may take a **very long**
 ## time. Consider changing the 'top' variable to a smaller number if it takes too much time.
 ## With this current setting, I left the laptop run overnight to retrieve all the records.
-top <- 1000
+top <- 500
 top.imei <- as.character(dimei.distr$imei[1:top])
 
 ## Retrieve all call records from the top IMEI's
