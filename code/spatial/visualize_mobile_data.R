@@ -71,7 +71,7 @@ pipe_1 <- mongo.bson.from.JSON(
 )
 ## Get those whose call frequencies are at least X
 pipe_2 <- mongo.bson.from.JSON(
-  '{"$match": {"count": {"$gte": 90}}}'
+  '{"$match": {"count": {"$gte": 80}}}'
 )
 ## And those whose call frequencies are no more than Y
 pipe_3 <- mongo.bson.from.JSON(
@@ -95,7 +95,7 @@ dimei.distr$freq <- call.freq
 ## Plot the histogram of the IMEI frequencies
 (ggplot(dimei.distr, aes(freq)) + geom_histogram(binwidth=2, fill="#c0392b", alpha=0.75) +
    fivethirtyeight_theme() + 
-   labs(title="Distribution of Call Frequencies in [90, 100]",
+   labs(title="Distribution of Call Frequencies in [80, 100]",
         x="Call Frequency", y="Frequency") + scale_x_continuous(labels=comma) +
    scale_y_continuous(labels=comma) + geom_hline(yintercept=0, size=0.4, color="black"))
 
@@ -108,7 +108,8 @@ dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## NOTE: The retrieval of records through IMEI (depending on many) may take a **very long**
 ## time. Consider changing the 'top' variable to a smaller number if it takes too much time.
 ## With this current setting, I left the laptop run overnight to retrieve all the records.
-top <- 500
+percent <- 0.15
+top <- round(percent * nrow(dimei.distr))
 top.imei <- as.character(dimei.distr$imei[1:top])
 
 ## Retrieve all call records from the top IMEI's
