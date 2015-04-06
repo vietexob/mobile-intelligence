@@ -108,7 +108,7 @@ dimei.distr <- dimei.distr[order(-dimei.distr$freq), ]
 ## NOTE: The retrieval of records through IMEI (depending on many) may take a **very long**
 ## time. Consider changing the 'top' variable to a smaller number if it takes too much time.
 ## With this current setting, I left the laptop run overnight to retrieve all the records.
-percent <- 0.15
+percent <- 0.10
 top <- round(percent * nrow(dimei.distr))
 top.imei <- as.character(dimei.distr$imei[1:top])
 
