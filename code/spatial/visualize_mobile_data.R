@@ -19,7 +19,7 @@ rm(list = ls())
 ## Load the required packages, assuming they have been installed
 library(rmongodb)
 library(ggplot2)
-library(ggmap) # for plotting maps
+# library(ggmap) # for plotting maps
 library(igraph) # for plotting graphs
 library(popgraph) # for plotting population graphs
 library(scales) # for plot formatting 
