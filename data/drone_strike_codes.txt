@@ -2,7 +2,7 @@ Strike codes
 Each drone strike recorded by the Bureau has a unique code. They begin with B for the Bush-era strikes and Ob for the Obama-era strikes.
 				
 Tribal Agency/Province				
-Pakistan's Federally Administereed Tribal Area (FATA) is divided into seven tribal agencies.Almost all the strikes have hit within the FATA. The exception is a strike in KPK, which is outside the tribal areas.				
+Pakistan's Federally Administered Tribal Area (FATA) is divided into seven tribal agencies.Almost all the strikes have hit within the FATA. The exception is a strike in KPK, which is outside the tribal areas.				
 				
 Latitude and Longitude				
 The locations of almost every strike is identified in the sources used to compile the database. The Bureau identified and plotted the latitude and longitude using a CIA map of Waziristan, declassified in 2007. Locations of strikes are reported to hit in or near specific towns or villages. But they do not specify which houses or streets are attacked. Therefore the latitude and longitude give a false degree of accuracy and specificity to the target location.				
@@ -16,7 +16,7 @@ Times of day
 Morning	0500-1159			
 Afternoon	1200-1759			
 Evening	1800-2159			
-NIght	2200-0459			
+Night	2200-0459			
 Unknown	Reports of time period were at times contradictory or overly vague and do not fall into one of the above four categories			
 				
 Targets				

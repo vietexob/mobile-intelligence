@@ -39,6 +39,7 @@ drone.map <- drone.map + ggtitle("US Drone Strikes in Pakistan from 2008 to 2013
 ## Add the density contours
 drone.map <- drone.map + geom_density2d(data = subset.drone.data,
                                         aes(x = Longitude, y = Latitude))
+## Plot strikes by each year
 drone.map <- drone.map + facet_wrap(~year)
 print(drone.map)
 ## Save the plot on disk
