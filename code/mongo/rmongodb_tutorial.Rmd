@@ -82,7 +82,6 @@ query <- mongo.bson.from.list(list('imei'=355001000488650))
 fields <- mongo.bson.buffer.create()
 ## '1L' means we want to turn this field on, '0L' to turn it off
 mongo.bson.buffer.append(fields, "_id", 0L)
-mongo.bson.buffer.append(fields, "cell_id", 1L)
 mongo.bson.buffer.append(fields, "caller_id", 1L)
 mongo.bson.buffer.append(fields, "callee_id", 1L)
 mongo.bson.buffer.append(fields, "date", 1L)
