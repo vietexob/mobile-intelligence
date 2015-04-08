@@ -9,7 +9,7 @@ source("./code/util/fivethirtyeight_theme.R")
 
 ## See http://www.thebureauinvestigates.com/2014/05/23/get-the-data-what-the-drones-strike/
 
-drone.data <- read.csv(file="./data/drone_strikes.csv")
+drone.data <- read.csv(file="./data/drone/drone_strikes.csv")
 ## Break down by year
 year <- vector()
 for(i in 1:nrow(drone.data)) {
