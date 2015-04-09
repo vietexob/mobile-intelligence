@@ -129,6 +129,7 @@ for(aKey in all.keys) {
 
 ## Compute the distance matrix between all pairs of cell_ids in act.matrix
 ## TODO: Extract function getDistMatrix
+unknown_distance <- 30
 act.cell_ids <- names(table(act.matrix))
 dist_matrix <- matrix(0, nrow=length(act.cell_ids), ncol=length(act.cell_ids))
 rownames(dist_matrix) <- colnames(dist_matrix) <- act.cell_ids
@@ -153,8 +154,8 @@ for(i in 1:nrow(dist_matrix)) {
       to_cell_id <- act.cell_ids[j]
       if(from_cell_id != to_cell_id) {
         if(from_cell_id == "0") {
-          dist_matrix[i, j] <- 10
-          dist_matrix[j, i] <- 10
+          dist_matrix[i, j] <- unknown_distance
+          dist_matrix[j, i] <- unknown_distance
         } else {
           to_row_index <- cell_id.coord.rowIndex[[to_cell_id]]
           if(is.null(to_row_index)) {
@@ -182,12 +183,11 @@ trajec.seq <- seqdef(act.matrix, xtstep = 2, cpal = cl)
 
 # Compute the pairwise optimal matching (OM) distances between sequences
 # with insertion/deletion cost of 1 and substitution cost matrix based on dist.matrix
-trajec.om <- seqdist(trajec.seq, method = "OM", indel = 10, sm = dist_matrix)
-trajec.om <- seqdist(trajec.seq, method = "OM", indel = 10, sm = "TRATE")
+trajec.om <- seqdist(trajec.seq, method = "OM", indel = unknown_distance, sm = dist_matrix)
+# trajec.om <- seqdist(trajec.seq, method = "OM", indel = 10, sm = "TRATE")
 
 # Do hierarchical cluster analysis
 mobile.cluster <- agnes(trajec.om, diss = TRUE, method = "ward")
-
 # Plot the hierarchy (tree)
 pdf(file = "./figures/mobile/mobile_clusters.pdf")
 mainStr <- "Sequence Hierarchical Clustering"
