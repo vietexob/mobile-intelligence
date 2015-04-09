@@ -1,0 +1,85 @@
+version()
+help()
+quit()
+library(rj)
+quit()
+?ln
+?log
+1/0.05 * (10 * log(3) + log(1/0.05))
+quit()
+epsilon <- 0.05
+delta <- 0.05
+vch <- 56
+1/epsilon(4*log2(2/delta) + 8*vch*log2(13/epsilon))
+1/epsilon * (4*log2(2/delta) + 8*vch*log2(13/epsilon))
+vch
+delta
+epsilon
+quit()
+install.packages("R.matlab")
+library(R.matlab)
+?R.matlab
+quit()
+install.packages("neuralnet")
+library(neuralnet)
+getwd()
+ls()
+?multinom
+library(nnet)
+?multinom
+getwd()
+library(nnet)
+data(iris)
+set.seed(1234)
+x <- iris[sample(1:nrow(iris)), ]
+dim(x)
+x <- cbind(x, useless = rnorm(nrow(x)))
+?cbind
+x[, 1] <- x[, 1] + rnorm(nrow(x))
+x[, 2] <- x[, 2] + rnorm(nrow(x))
+x[, 3] <- x[, 3] + rnorm(nrow(x))
+plot(x, col = x$Species)
+names(x)
+head(x)
+table(x$Species)
+train <- x[1:100, ]
+test <- x[101:150, ]
+library(caret)
+install.packages("caret")
+library(caret)
+model.knn3 <- knn3(Species ~ ., k = 5, data = train)
+?knn3
+model.knn3
+summary(model.knn3)
+predict(model.knn3, test, type = "class")
+table(true = test$Species, predicted = predict(model.knn3, test, type = "class"))
+?nnet
+model.nnet <- nnet(Species ~ ., data = train, size = 10)
+model.nnet
+predict(model_nnet, test)
+predict(model.nnet, test, type = "class")
+predict(model.nnet, test)
+table(true = test$Species, predicted = predict(model.nnet, test, type = "class"))
+?nnet
+quit()
+library(rJava)
+library(OpenStreetMap)
+install.packages("rgdal")
+library(maptools)
+quit()
+library(rJava)
+?rJava
+quit()
+library(gplots)
+example(heatmap.2)
+quit()
+getwd()
+setwd("./Documents/workspace/mobile-intelligence/")
+getwd()
+source("./code/spatial/taxi_flows.R")
+ls()
+dim(taxi.data)
+head(taxi.data)
+query
+write.csv(taxi.data, file="./data/taxi_gps_2009_09_11.csv", row.names=FALSE)
+quit()
