@@ -26,9 +26,10 @@ library(scales) # for plot formatting
 library(plyr) # for data manipulation
 
 ## Source the useful functions
-source("./code/util/fivethirtyeight_theme.R") # fancy-looking theme for the plot
+source("./code/util/fivethirtyeight_theme.R") # fancy theme for the plot
 source("./code/spatial/getWeightedEdges.R") # create weighted call graph
-source("./code/spatial/aggregateLocationByDate.R") # for call data aggregation by date
+source("./code/spatial/aggregateLocationByDate.R") # call data aggregation by date
+source("./code/spatial/getSpatialRowIndices.R")
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
@@ -41,12 +42,14 @@ cell.towers$Latitude <- as.numeric(cell.towers$Latitude)
 load("./data/mobile/cell_id_rowIndex_mapping.RData")
 
 ## Load the previously retrieved call data
-## NB: This is the call data frame retrieved from the lines below (67-155).
+## NB: This is the call data frame retrieved from the lines below.
 ## Because it has taken a significant retrieval time, I saved it as an offline file
 ## and load it whenever I want to use it. If you want to use this data frame, skip lines
 ## 67 to 155 to save time. Feel free to experiment with other params and get a diff dataset.
-call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv")
+# call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv")
+call.data <- read.csv(file="./data/mobile/my_call_data_80_100_10_pct.csv")
 
+#################### START: CALL DATA RETRIEVAL ####################
 ## Login credentials
 host <- "heinz-tjle.heinz.cmu.edu"
 username <- "student"
@@ -162,32 +165,10 @@ mongo.cursor.destroy(cursor)
 mongo.disconnect(mongo)
 mongo.destroy(mongo)
 
-## Match each cell_id with its corresponding rowIndex of the coordinate table
-progress.bar <- create_progress_bar("text")
-progress.bar$init(nrow(call.data))
-rowIndices <- vector() # a vector of row indices
-nMatches <- 0 # count the number of matches
-for(i in 1:nrow(call.data)) {
-  ## Have to convert numeric to string in order to do lookup
-  cell_id <- toString(call.data$cell_id[i])
-  if(nchar(cell_id) > 0) {
-    ## Look up the (loaded) table
-    rowIndex <- cell_id.coord.rowIndex[[cell_id]]
-    if(is.null(rowIndex)) { # if matched
-      rowIndices <- c(rowIndices, NA)
-    } else { # if unmatched
-      rowIndices <- c(rowIndices, rowIndex)
-      nMatches <- nMatches + 1
-    }
-  } else {
-    rowIndices <- c(rowIndices, NA)
-  }
-  
-  progress.bar$step()
-}
-## Calculate the matched percentage
-match.pct <- round(nMatches / nrow(call.data) * 100, 2)
-print(paste("Percent matched locations =", match.pct))
+#################### END: CALL DATA RETRIEVAL ####################
+
+## Match each cell_id with its corresponding rowIndex of the cell.towers data frame
+rowIndices <- getSpatialRowIndices(call.data, cell_id.coord.rowIndex)
 
 ## Reduce call data to those that can be plotted on a map
 my.call.data <- call.data[!is.na(rowIndices), ]
@@ -285,7 +266,7 @@ V(g)$size <- degree(g, mode = "all")
 g <- decorate_graph(g, cell.towers, stratum = "Cell")
 
 ## Retrieve the map from Google Maps
-g.map <- get_map(location, maptype = "terrain", zoom = 11, scale=2)
+g.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 g.map <- ggmap(g.map, extent = 'device', legend = 'none')
 ## Add nodes to the map, where each code is described by a pair of coordinates
 ## and scaled by its size (i.e., call frequency)

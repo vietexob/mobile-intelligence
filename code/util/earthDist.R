@@ -1,5 +1,7 @@
 earthDist <- function(lon1, lat1, lon2, lat2) {
-  # Computes the Euclidean distsance between 2 points defined by their coords in KM
+  ## Computes the Euclidean distsance between 2 given points
+  ## defined by their coordinates in kilometers.
+  
   R <- 6371 # Earth's radius in kilometers
   rad <- pi / 180
   
@@ -14,5 +16,6 @@ earthDist <- function(lon1, lat1, lon2, lat2) {
   a <- (sin(dlat/2))^2 + cos(a1)*cos(b1)*(sin(dlon/2))^2
   c <- 2 * atan2(sqrt(a), sqrt(1-a))
   d <- R * c
+  
   return(d)
 }

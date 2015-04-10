@@ -1,6 +1,6 @@
 splitTrainTest <- function(data, k, unique.key="", test.id=1) {
-  # data: the input data
-  # k: the number of folds
+  ## data: the input data
+  ## k: the number of folds
   
   if(k < 2) {
     stop(paste("k = ", k, sep = ""))
