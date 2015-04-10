@@ -35,7 +35,7 @@ for(i in 1:length(V(g))) {
 V(g)$name <- userId
 
 ## Exclude those nodes that are at the periphery of the network
-theta <- 55 # the threshold
+theta <- 55 # threshold
 bad.nodes <- V(g)[degree(g) < theta] # low-degree nodes
 f <- delete.vertices(g, bad.nodes) # f is the new network
 
