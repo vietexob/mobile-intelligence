@@ -11,5 +11,4 @@ The topics covered in the tutorials (and according to which the subdirectories a
 - **mongo** -- accessing and querying data in MongoDB using the `rmongodb` package.
 
 Some subdirectories in `code` contain helper functions, which may come in handy at times.
-- **misc** -- miscellaneous plotting functions
 - **util** -- utility functions for miscellaneous uses.
