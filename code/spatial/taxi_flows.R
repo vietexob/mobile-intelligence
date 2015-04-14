@@ -3,7 +3,9 @@ rm(list = ls())
 library(plyr)
 library(ggplot2)
 library(maptools)
-library(rmongodb)
+library(rgdal)
+library(rgeos)
+# library(rmongodb)
 
 source("./code/util/fivethirtyeight_theme.R")
 
@@ -63,7 +65,7 @@ taxi.data <- read.csv(file="./data/taxi/taxi_gps_2009_09_11.csv", header=TRUE)
 ## Compute the duration between each timestamp
 duration <- vector()
 trip_indicator <- vector()
-threshold <- 15*60 # minutes
+threshold <- 15*60 # seconds
 
 ## Create a progress bar
 progress.bar <- create_progress_bar("text")
@@ -138,18 +140,55 @@ for(i in 1:nrow(taxi.data)) {
 
 ## Combine the OD pairs
 od.data <- cbind(or.data, dest.data)
+## Add artificial group to the OD pairs in order to be compatitable with the shapefiles
+od.data$group <- seq(1:nrow(od.data))
 
 ## Remove the axes in the resulting plot
 x_quiet <- scale_x_continuous("", breaks=NULL)
 y_quiet <- scale_y_continuous("", breaks=NULL)
 quiet <- list(x_quiet, y_quiet)
 
-## Plot all OD pairs
-od.plot <- ggplot(data = od.data, aes(x=or_lon, y=or_lat)) +
-  geom_segment(aes(x=or_lon, y=or_lat, xend=dest_lon, yend=dest_lat), alpha=0.8, col="red") +
-  theme(panel.background=element_rect(fill="black", color="black")) + # set black background
-  quiet + coord_equal() + guides(alpha=FALSE) + # remove axes and fix aspect ratio
-  ggtitle("All OD Pairs on 09/11/2009") + fivethirtyeight_theme()
-print(od.plot)
+## Read the shapefiles
+## The spatial object wouldn't have a coordinate system assigned to it.
+## We can check it by proj4string(sz_bou). We thus need to assign a CRS
+## (coordinate reference system) to the object before we can plot it.
+## Here we use the WGS84 standard (the World Geodetic System proposed in 1984)
+sz_bou <- readOGR(dsn="./data/sz_shp/", layer="sz_bou")
+proj4string(sz_bou) <- CRS("+init=epsg:4326")
 
-ggsave(filename="./figures/spatial/od_pairs.png")
+sz_road <- readOGR(dsn="./data/sz_shp/", layer="sz_road")
+proj4string(sz_road) <- CRS("+init=epsg:4326")
+
+sz_veg <- readOGR(dsn="./data/sz_shp/", layer="sz_veg")
+proj4string(sz_veg) <- CRS("+init=epsg:4326")
+
+sz_wat <- readOGR(dsn="./data/sz_shp/", layer="sz_wat")
+proj4string(sz_wat) <- CRS("+init=epsg:4326")
+
+## Convert shapefiles into data frames so that they can be plotted using ggplot
+sz_bou.data <- fortify(sz_bou)
+sz_road.data <- fortify(sz_road) ## this will take a while
+sz_veg.data <- fortify(sz_veg)
+sz_wat.data <- fortify(sz_wat)
+
+## Plot the shapfiles using ggplot
+shenzhen <- ggplot(data=sz_bou.data, aes(x=long, y=lat,
+                                         group=group)) + geom_polygon(fill="lightblue") +
+  ggtitle("Map of Shenzhen + All Taxi OD Pairs on 09/11/2009")
+shenzhen <- shenzhen + geom_polygon(data=sz_wat.data,
+                                    aes(x=long, y=lat, group=group),
+                                    fill="blue", alpha=0.75)
+shenzhen <- shenzhen + geom_polygon(data=sz_veg.data,
+                                    aes(x=long, y=lat, group=group),
+                                    fill="darkgreen", alpha=0.75)
+shenzhen <- shenzhen + geom_polygon(data=sz_road.data,
+                                    aes(x=long, y=lat, group=group),
+                                    color="darkgrey", fill=NA)
+## Add OD pairs to the shapefiles
+shenzhen.od <- shenzhen + geom_segment(data=od.data, aes(x=or_lon, y=or_lat,
+                                                         xend=dest_lon, yend=dest_lat,
+                                                         group=group),
+                                       alpha=0.8, col="red") + quiet + coord_equal() +
+  fivethirtyeight_theme()
+print(shenzhen.od)
+ggsave(filename="./figures/spatial/shenzhen_od_pairs.png", scale = 3, dpi = 400)

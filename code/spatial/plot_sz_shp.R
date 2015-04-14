@@ -16,21 +16,21 @@ library(rgeos)
 ## We can check it by proj4string(sz_bou). We thus need to assign a CRS
 ## (coordinate reference system) to the object before we can plot it.
 ## Here we use the WGS84 standard (the World Geodetic System proposed in 1984)
-sz_bou <- readShapeSpatial(fn="./data/sz_shp/sz_bou.shp",
-                           proj4string = CRS("+proj=longlat + datum=WGS84"))
-sz_road <- readShapeSpatial(fn="./data/sz_shp/sz_road.shp",
-                            proj4string = CRS("+proj=longlat + datum=WGS84"))
-sz_veg <- readShapeSpatial(fn="./data/sz_shp/sz_veg.shp",
-                           proj4string = CRS("+proj=longlat + datum=WGS84"))
-sz_poi <- readShapeSpatial(fn="./data/sz_shp/sz_poi.shp",
-                           proj4string = CRS("+proj=longlat + datum=WGS84"))
-sz_wat <- readShapeSpatial(fn="./data/sz_shp/sz_wat.shp",
-                           proj4string = CRS("+proj=longlat + datum=WGS84"))
-## This will result in an error for some reason
-# sz_tow <- readShapeSpatial(fn="./data/sz_shp/sz_tow.shp",
-#                            proj4string = CRS("+proj=longlat + datum=WGS84"))
+sz_bou <- readOGR(dsn="./data/sz_shp/", layer="sz_bou")
+proj4string(sz_bou) <- CRS("+init=epsg:4326")
 
-## This is a quirky walkaround
+sz_road <- readOGR(dsn="./data/sz_shp/", layer="sz_road")
+proj4string(sz_road) <- CRS("+init=epsg:4326")
+
+sz_veg <- readOGR(dsn="./data/sz_shp/", layer="sz_veg")
+proj4string(sz_veg) <- CRS("+init=epsg:4326")
+
+sz_poi <- readOGR(dsn="./data/sz_shp/", layer="sz_poi")
+proj4string(sz_poi) <- CRS("+init=epsg:4326")
+
+sz_wat <- readOGR(dsn="./data/sz_shp/", layer="sz_wat")
+proj4string(sz_wat) <- CRS("+init=epsg:4326")
+
 sz_tow <- readOGR(dsn="./data/sz_shp/", layer="sz_tow")
 ## Assign WGS84 coordinate system to the object
 proj4string(sz_tow) <- CRS("+init=epsg:4326")
