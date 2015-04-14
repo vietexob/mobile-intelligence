@@ -12,7 +12,8 @@ source("./code/clustering/getDistanceMatrix.R")
 source("./code/util/fivethirtyeight_theme.R")
 
 # call.data <- read.csv(file="./data/mobile/my_call_data_90_100_500.csv", header=TRUE)
-call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv", header=TRUE)
+# call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv", header=TRUE)
+call.data <- read.csv(file="./data/mobile/my_call_data_80_100_10_pct.csv", header=TRUE)
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
@@ -73,7 +74,7 @@ mainStr <- "Sequence Hierarchical Clustering"
 plot(mobile.cluster, which.plots = 2, labels = FALSE, main = mainStr)
 dev.off()
 
-K <- 5 # number of clusters
+K <- 4 # number of clusters
 trajec.cl <- cutree(mobile.cluster, K)
 
 pdf(file = "./figures/clustering/mobile_trajec_cl.pdf", width=12, height=10)
