@@ -1,16 +1,26 @@
 rm(list = ls())
 
+## This tutorial demonstrates the use of unsupervised hierarchical clustering for the task
+## of spatiotemporal trajectory clustering. Throughout the tutorial, we will make use of the
+## mobile phone dataset for illustration. We will also make use of the third-party R package
+## TraMineR to streamline the clustering and visualization of clusters. Make sure the package
+## is installed before you proceed with the tutorial.
+
+## Load the necessary installed packages
 library(TraMineR)
 library(cluster)
 library(ggplot2)
 library(ggmap)
 library(plyr)
 
+## Source the useful functions
 source("./code/spatial/getSpatialRowIndices.R")
 source("./code/clustering/getActivityMatrix.R")
 source("./code/clustering/getDistanceMatrix.R")
 source("./code/util/fivethirtyeight_theme.R")
 
+## Load one of the retrieved datasets from the mobile phone collection. Refer to the previous
+## tutorial on mobile data visualization to understand how they were retrieved.
 # call.data <- read.csv(file="./data/mobile/my_call_data_90_100_500.csv", header=TRUE)
 # call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv", header=TRUE)
 call.data <- read.csv(file="./data/mobile/my_call_data_80_100_10_pct.csv", header=TRUE)
@@ -33,13 +43,15 @@ my.call.data <- call.data[!is.na(rowIndices), ]
 my.call.data <- subset(my.call.data, date > 20080229)
 my.call.data <- subset(my.call.data, date < 20080308)
 
-## Calculate the number of minutes until event
-minute <- vector()
+## Calculate the number of minutes until call event
+minute <- vector() # vector to store the minutes
 progress.bar <- create_progress_bar("text")
 progress.bar$init(nrow(my.call.data))
 for(i in 1:nrow(my.call.data)) {
+  ## Convert each timestamp to string and split it by colon
   timestamp <- toString(call.data$time[i])
   timestamp <- strsplit(timestamp, ":")[[1]]
+  ## Convert conventional time format into the number of minutes
   minutes <- round(as.numeric(timestamp[1])*60 + as.numeric(timestamp[2]) +
                      as.numeric(timestamp[3])/60, 2)
   minute[i] <- minutes
@@ -51,32 +63,36 @@ my.call.data$minute <- minute
 act.matrix <- getActivityMatrix(my.call.data, delta=30)
 
 ## Compute the distance matrix between all pairs of cell_ids in act.matrix
-unknown_distance <- 30
+unknown_distance <- 30 # define a distance between a known location and an unknown one
+## Create a pairwise distance matrix between all possible locations in the trajectories
 dist_matrix <- getDistanceMatrix(act.matrix, cell_id.coord.rowIndex,
                                  cell.towers, unknown_distance)
 
 ## Define the sequences
-n.states <- length(table(act.matrix))
-## Select colors for the activities
+n.states <- length(table(act.matrix)) # the number of unique locations, or 'states'
+## Select colors for the locations
 cl <- colors()[seq(from = 1, by = 2, length.out = n.states)]
 ## xtstep = 2: tick-mark displayed every two positions
 trajec.seq <- seqdef(act.matrix, xtstep = 2, cpal = cl)
 
-# Compute the pairwise optimal matching (OM) distances between sequences
-# with insertion/deletion cost of 1 and substitution cost matrix based on dist.matrix
+## Compute the pairwise optimal matching (OM) distances between all the sequences
+## with insertion/deletion cost given by the unknown distance and substitution cost
+## matrix described by the pairwise distance matrix
 trajec.om <- seqdist(trajec.seq, method = "OM", indel = unknown_distance, sm = dist_matrix)
 
-# Do hierarchical cluster analysis
+# Perform hierarchical cluster analysis
 mobile.cluster <- agnes(trajec.om, diss = TRUE, method = "ward")
-# Plot the hierarchy (tree)
+# Plot the hierarchy (i.e., the tree)
 pdf(file = "./figures/clustering/mobile_cl_tree.pdf")
 mainStr <- "Sequence Hierarchical Clustering"
 plot(mobile.cluster, which.plots = 2, labels = FALSE, main = mainStr)
 dev.off()
 
+## Define a meaningful number of clusters and cut the tree there
 K <- 4 # number of clusters
 trajec.cl <- cutree(mobile.cluster, K)
 
+## Visualize the dsitribution of locations of each cluster along time (and save the plot)
 pdf(file = "./figures/clustering/mobile_trajec_cl.pdf", width=12, height=10)
 seqdplot(trajec.seq, group = trajec.cl, border = NA, title="Cluster", withlegend="auto")
 dev.off()
@@ -90,8 +106,7 @@ for(i in 1:length(caller_ids)) {
 }
 save(caller_id.cluster, file="./data/mobile/caller_id_cluster_mapping.RData")
 
-## Plot the spatial locations of each cluster for one-day duration
-## Assign cluster label and add longitude and latitude coordinates to my call data frame
+## Plot the spatial locations of each cluster for the one-day duration
 cluster <- vector()
 longitude <- vector()
 latitude <- vector()
@@ -107,11 +122,13 @@ for(i in 1:nrow(my.call.data)) {
   latitude[i] <- cell.towers$Latitude[rowIndex]
   progress.bar$step()
 }
+## Create a data frame to contain the spatial coordinates and cluster label of each event
 my.cluster.data <- data.frame(longitude=longitude, latitude=latitude, cluster=cluster)
 my.cluster.data <- data.frame(table(my.cluster.data))
+## Retain only those with non-zero frequency
 my.cluster.data <- subset(my.cluster.data, Freq > 0)
 
-## Convert longitude and latitude to numeric format
+## Convert the longitude and latitude (from factor) to numeric type
 num_longitude <- vector()
 num_latitude <- vector()
 for(i in 1:nrow(my.cluster.data)) {
@@ -133,7 +150,7 @@ location <- c(mean.longitude, mean.latitude)
 cluster.map <- get_map(location, maptype = "terrain", zoom = 10, scale=2)
 cluster.map <- ggmap(cluster.map, extent = 'device', legend = 'none')
 
-## Add the "bubbles" to the map, and size them by frequency.
+## Add "bubbles" to the map, sized by frequency and colored by cluster label
 cluster.map <- cluster.map + geom_point(data = my.cluster.data,
                                         aes(x = longitude, y = latitude, size = Freq,
                                             fill=cluster), alpha=0.80, shape=21)

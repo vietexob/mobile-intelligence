@@ -1,5 +1,7 @@
 getDistanceMatrix <- function (act.matrix, cell_id.coord.rowIndex,
                                cell.towers, unknown_distance=30) {
+  ## This function returns a pairwise distance matrix between all possible locations in
+  ## the input activity matrix.
   require(plyr)
   source("./code/util/earthDist.R")
   

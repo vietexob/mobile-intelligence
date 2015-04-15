@@ -1,4 +1,10 @@
 getActivityMatrix <- function (call.data, delta=15) {
+  ## This function returns an activity matrix of dimension n x m, where n is the number of
+  ## agents (i.e., individuals) and m is the number of discrete time periods of a day (24-hour
+  ## period). Each activity is a known or unknown (which is specified by symbol '0') location
+  ## of an individual recorded during a specific time period of a day. This assumes the input
+  ## to be a call data frame and delta is the length (in minutes) of the time period that
+  ## divides the day into. Default value of delta is 15 minutes.
   require(plyr)
   
   caller_id.table <- table(call.data$caller_id)
