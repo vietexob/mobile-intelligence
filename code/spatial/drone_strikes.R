@@ -28,19 +28,21 @@ mean.longitude <- mean(subset.drone.data$Longitude)
 mean.latitude <- mean(subset.drone.data$Latitude)
 drone.map <- get_map(location = c(mean.longitude, mean.latitude),
                      zoom = 9, scale = 2)
-## Plot the strike locations, colored by time period and sized by minimum # casualties
-strike.pts <- geom_point(data = subset.drone.data, aes(x = Longitude, y = Latitude,
-                                                       fill = Time.Period,
-                                                       size = Minimum.Total.Reported.Killed),
-                         alpha = 0.80, shape = 21)
-drone.map <- ggmap(drone.map) + strike.pts + guides(size=FALSE, alpha = FALSE)
+drone.map <- ggmap(drone.map, extent="device", legend="none")
+
+drone.map <- drone.map + stat_density2d(data=subset.drone.data,
+                                        aes(x=Longitude, y=Latitude, fill=..level..,
+                                            alpha=..level..), geom="polygon")
+drone.map <- drone.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+drone.map <- drone.map + geom_point(data=subset.drone.data,
+                                    aes(x=Longitude, y=Latitude),
+                                    fill="red", shape=21, alpha=0.8)
+drone.map <- drone.map + guides(size=FALSE, alpha = FALSE) + fivethirtyeight_theme()
 ## Give the map a title
-drone.map <- drone.map + ggtitle("US Drone Strikes in Pakistan from 2008 to 2013 (sized by # casualties)")
-## Add the density contours
-drone.map <- drone.map + geom_density2d(data = subset.drone.data,
-                                        aes(x = Longitude, y = Latitude))
+drone.map <- drone.map + ggtitle("US Drone Strikes in Pakistan from 2008 to 2013")
+
 ## Plot strikes by each year
 drone.map <- drone.map + facet_wrap(~year)
 print(drone.map)
 ## Save the plot on disk
-ggsave(filename="./figures/spatial/drone_strikes.pdf", width=20, height=15)
+ggsave(filename="./figures/spatial/drone_strikes.png", width=12, height=9)
