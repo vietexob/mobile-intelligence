@@ -29,14 +29,17 @@ mean.latitude <- mean(subset.drone.data$Latitude)
 drone.map <- get_map(location = c(mean.longitude, mean.latitude),
                      zoom = 9, scale = 2)
 drone.map <- ggmap(drone.map, extent="device", legend="none")
-
+## Plot a heat map layer: Polygons with fill color based on relative frequency of events
 drone.map <- drone.map + stat_density2d(data=subset.drone.data,
                                         aes(x=Longitude, y=Latitude, fill=..level..,
                                             alpha=..level..), geom="polygon")
+## Define the colors to fill the density contours
 drone.map <- drone.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+## Add the strike points, color them red and define round shape
 drone.map <- drone.map + geom_point(data=subset.drone.data,
                                     aes(x=Longitude, y=Latitude),
                                     fill="red", shape=21, alpha=0.8)
+## Remove any legend and apply fancy theme
 drone.map <- drone.map + guides(size=FALSE, alpha = FALSE) + fivethirtyeight_theme()
 ## Give the map a title
 drone.map <- drone.map + ggtitle("US Drone Strikes in Pakistan from 2008 to 2013")
