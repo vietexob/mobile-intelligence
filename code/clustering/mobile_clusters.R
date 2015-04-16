@@ -154,12 +154,12 @@ cluster.map <- ggmap(cluster.map, extent = 'device', legend = 'none')
 cluster.map <- cluster.map + geom_point(data = my.cluster.data,
                                         aes(x = longitude, y = latitude, size = Freq,
                                             fill=cluster), alpha=0.80, shape=21)
-## Remove any legends from the plot
-cluster.map <- cluster.map + guides(fill=FALSE, alpha=FALSE, size=FALSE)
+## Remove any some of the legends from the plot
+cluster.map <- cluster.map + guides(alpha=FALSE, size=FALSE)
 ## Add a title to the plot
 cluster.map <- cluster.map + ggtitle("Clusters of Call Events over the Week")
 ## Add a fancy theme to it (this step is optional)
-cluster.map <- cluster.map + fivethirtyeight_theme()
+# cluster.map <- cluster.map + fivethirtyeight_theme()
 ## Display the plot (or else it won't show)
 print(cluster.map)
 
