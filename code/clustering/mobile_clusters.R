@@ -21,9 +21,9 @@ source("./code/util/fivethirtyeight_theme.R")
 
 ## Load one of the retrieved datasets from the mobile phone collection. Refer to the previous
 ## tutorial on mobile data visualization to understand how they were retrieved.
-# call.data <- read.csv(file="./data/mobile/my_call_data_90_100_500.csv", header=TRUE)
+call.data <- read.csv(file="./data/mobile/my_call_data_90_100_500.csv", header=TRUE)
 # call.data <- read.csv(file="./data/mobile/my_call_data_100_300_1500.csv", header=TRUE)
-call.data <- read.csv(file="./data/mobile/my_call_data_80_100_10_pct.csv", header=TRUE)
+# call.data <- read.csv(file="./data/mobile/my_call_data_80_100_10_pct.csv", header=TRUE)
 
 ## Read the cell towers spatial coordinates
 cell.towers <- read.csv(file="./data/mobile/cell_coord.csv", stringsAsFactors=FALSE)
@@ -89,11 +89,11 @@ plot(mobile.cluster, which.plots = 2, labels = FALSE, main = mainStr)
 dev.off()
 
 ## Define a meaningful number of clusters and cut the tree there
-K <- 4 # number of clusters
+K <- 2 # number of clusters
 trajec.cl <- cutree(mobile.cluster, K)
 
 ## Visualize the dsitribution of locations of each cluster along time (and save the plot)
-pdf(file = "./figures/clustering/mobile_trajec_cl.pdf", width=12, height=10)
+pdf(file = "./figures/clustering/mobile_trajec_cl.pdf", width=18, height=10)
 seqdplot(trajec.seq, group = trajec.cl, border = NA, title="Cluster", withlegend="auto")
 dev.off()
 
