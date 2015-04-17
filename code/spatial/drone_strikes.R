@@ -2,8 +2,6 @@ rm(list = ls())
 
 library(ggplot2)
 library(ggmap) # for plotting maps
-library(scales) # for plot formatting 
-library(plyr) # for data manipulation
 
 source("./code/util/fivethirtyeight_theme.R")
 
