@@ -2,8 +2,7 @@ rm(list = ls())
 
 library(ggplot2)
 library(ggmap) # for plotting maps
-
-source("./code/util/fivethirtyeight_theme.R")
+library(RColorBrewer)
 
 ## See http://www.thebureauinvestigates.com/2014/05/23/get-the-data-what-the-drones-strike/
 
@@ -37,13 +36,13 @@ drone.map <- drone.map + scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectra
 drone.map <- drone.map + geom_point(data=subset.drone.data,
                                     aes(x=Longitude, y=Latitude),
                                     fill="red", shape=21, alpha=0.8)
-## Remove any legend and apply fancy theme
-drone.map <- drone.map + guides(size=FALSE, alpha = FALSE) + fivethirtyeight_theme()
+## Remove any legend
+drone.map <- drone.map + guides(size=FALSE, alpha = FALSE)
 ## Give the map a title
 drone.map <- drone.map + ggtitle("US Drone Strikes in Pakistan from 2008 to 2013")
 
 ## Plot strikes by each year
-drone.map <- drone.map + facet_wrap(~year)
+drone.map <- drone.map + facet_wrap(~year) + theme_bw()
 print(drone.map)
 ## Save the plot on disk
-ggsave(filename="./figures/spatial/drone_strikes.png", width=12, height=9)
+ggsave(filename="./figures/spatial/drone_strikes.png")
